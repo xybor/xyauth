@@ -1,0 +1,107 @@
+version: '3'
+services:
+  postgresql:
+    container_name: {{ .postgresql.host }}
+    image: postgres:12
+    command: -p {{ .postgresql.port }}
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-{{ .default.postgres_user }}}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-{{ .default.postgres_password }}}
+      - POSTGRES_DB=${POSTGRES_DB:-{{ .default.postgres_db }}}
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    expose:
+      - {{ .postgresql.port }}
+    networks:
+      - MAIN
+      - PG_ADMIN
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL:-{{ .default.pgadmin_default_email }}}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD:-{{ .default.pgadmin_default_password }}}
+      - PGADMIN_CONFIG_SERVER_MODE=False
+    volumes:
+       - pgadmin:/var/lib/pgadmin
+    ports:
+      - 127.0.0.1:{{ .default.pgadmin_port }}:80
+    networks:
+      - PG_ADMIN
+
+  mongodb:
+    container_name: {{ .mongodb.host }}
+    image: mongo:6.0
+    command: mongod --port {{ .mongodb.port }}
+    restart: always
+    environment:
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE:-{{ .default.mongo_initdb_database }}}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-{{ .default.mongo_initdb_root_username }}}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-{{ .default.mongo_initdb_root_password }}}
+    volumes:
+      - mongodb:/data/db
+      - mongoconfig:/data/configdb
+    expose:
+      - {{ .mongodb.port }}
+    networks:
+      - MONGO_EXPRESS
+      - MAIN
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 127.0.0.1:{{ .default.mongo_express_port }}:8081
+    environment:
+      - ME_CONFIG_MONGODB_SERVER={{ .mongodb.host }}
+      - ME_CONFIG_MONGODB_PORT={{ .mongodb.port }}
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME:-{{ .default.mongo_initdb_root_username }}}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-{{ .default.mongo_initdb_root_password }}}
+    depends_on:
+      - mongodb
+    networks:
+      - MONGO_EXPRESS
+
+  xyauth:
+    container_name: xyauth
+    image: xyauth:latest
+    command: -c configs/compose.ini
+    restart: always
+    ports:
+      - {{ .server.host }}:{{ .server.port }}:8443
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-{{ .default.postgres_db }}}
+      - POSTGRES_USER=${POSTGRES_USER:-{{ .default.postgres_user }}}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-{{ .default.postgres_password }}}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE:-{{ .default.mongo_initdb_database }}}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME:-{{ .default.mongo_initdb_root_username }}}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-{{ .default.mongo_initdb_root_password }}}
+      - SERVER_PRIVATE_KEY
+      - SERVER_PUBLIC_KEY
+      - OAUTH_PRIVATE_KEY
+      - OAUTH_PUBLIC_KEY
+    depends_on:
+      - postgresql
+    networks:
+      - MAIN
+
+volumes:
+  postgresql:
+    name: postgresql
+  mongodb:
+    name: mongodb
+  mongoconfig:
+    name: mongoconfig
+  pgadmin:
+    name: pgadmin
+
+networks:
+  MONGO_EXPRESS:
+    name: MONGO_EXPRESS
+  PG_ADMIN:
+    name: PG_ADMIN
+  MAIN:
+    name: MAIN

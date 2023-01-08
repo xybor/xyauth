@@ -1,0 +1,26 @@
+name: Test
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+
+    - run: go mod tidy
+
+    - name: Test
+      run: go test -timeout 30s -v -race ./...
+      env:        
+        OAUTH_PRIVATE_KEY: ${secrets.OAUTH_PRIVATE_KEY}
+        OAUTH_PUBLIC_KEY: ${secrets.OAUTH_PUBLIC_KEY}
