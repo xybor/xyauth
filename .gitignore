@@ -5,6 +5,16 @@
 *.so
 *.dylib
 
+# Executable
+server
+!server/
+
+database
+!database/
+
+template
+!template/
+
 # Test binary, built with `go test -c`
 *.test
 
@@ -13,3 +23,15 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Server credentials
+*.key
+*.crt
+!/unittest/*.key
+!/unittest/*.crt
+
+# Environment variables
+.env
+
+# Generated files
+deploy/compose.yaml
