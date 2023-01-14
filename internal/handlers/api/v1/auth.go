@@ -16,10 +16,12 @@ type AuthParams struct {
 
 func AuthHandler(ctx *gin.Context) {
 	params := new(AuthParams)
-	ctx.ShouldBind(params)
+	if err := ctx.ShouldBind(params); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "invalid parameters"})
+		return
+	}
 
 	err := service.Authenticate(params.Email, params.Password)
-
 	if err != nil {
 		switch {
 		case errors.Is(err, service.NotFoundError):
@@ -27,14 +29,14 @@ func AuthHandler(ctx *gin.Context) {
 		case errors.Is(err, service.CredentialError):
 			ctx.JSON(http.StatusForbidden, gin.H{"message": xyerror.Message(err)})
 		case err != nil:
-			ctx.Status(http.StatusInternalServerError)
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": xyerror.Message(err)})
 		}
 		return
 	}
 
 	accessToken, err := service.CreateAccessToken(params.Email)
 	if err != nil {
-		ctx.Status(http.StatusInternalServerError)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": xyerror.Message(err)})
 		return
 	}
 

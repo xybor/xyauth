@@ -11,12 +11,12 @@ import (
 	"github.com/xybor/xyauth/pkg/token"
 )
 
-type RefreshParam struct {
+type RefreshParams struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
 func RefreshHandler(ctx *gin.Context) {
-	params := RefreshParam{}
+	params := RefreshParams{}
 	err := ctx.ShouldBind(&params)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "expect a refresh_token"})
@@ -35,7 +35,7 @@ func RefreshHandler(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.CheckWhitelist(params.RefreshToken); err != nil {
+	if err := service.CheckWhitelistRefreshToken(params.RefreshToken); err != nil {
 		if errors.Is(err, service.NotFoundError) {
 			ctx.JSON(http.StatusForbidden, gin.H{"message": xyerror.Message(err)})
 		} else {

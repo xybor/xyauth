@@ -30,10 +30,12 @@ func New() *gin.Engine {
 
 	router.GET(".well-known/openid-configuration", openid.Handler)
 	router.GET("login", appv1.LoginGETHandler)
-	router.POST("login", appv1.LoginPOSTHandler)
 	router.GET("register", appv1.RegisterGETHandler)
-	router.POST("register", appv1.RegisterPOSTHandler)
 	router.GET("refresh", appv1.RefreshHandler)
+	router.GET("logout", appv1.LogoutHandler)
+
+	router.POST("login", appv1.LoginPOSTHandler)
+	router.POST("register", appv1.RegisterPOSTHandler)
 
 	mustAuthGroup := router.Group("")
 	mustAuthGroup.Use(middlewares.VerifyAccessToken)
@@ -44,6 +46,8 @@ func New() *gin.Engine {
 	apiv1Group := router.Group("api/v1")
 	{
 		apiv1Group.POST("register", apiv1.RegisterHandler)
+		apiv1Group.POST("auth", apiv1.AuthHandler)
+		apiv1Group.POST("revoke", apiv1.RevokeHandler)
 	}
 
 	return router

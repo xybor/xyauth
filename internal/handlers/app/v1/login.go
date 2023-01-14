@@ -46,8 +46,6 @@ func LoginPOSTHandler(ctx *gin.Context) {
 
 	accessToken, err := service.CreateAccessToken(params.Email)
 	if err != nil {
-		utils.GetLogger().Event("create-access-token-failed").
-			Field("email", params.Email).Field("error", err).Warning()
 		ctx.HTML(http.StatusInternalServerError, "login.html", gin.H{
 			"message": "Something is wrong, please contact to administrator if the issue persists",
 		})
@@ -56,8 +54,6 @@ func LoginPOSTHandler(ctx *gin.Context) {
 
 	refreshToken, err := service.CreateRefreshToken(params.Email)
 	if err != nil {
-		utils.GetLogger().Event("create-refresh-token-failed").
-			Field("email", params.Email).Field("error", err).Warning()
 		ctx.HTML(http.StatusInternalServerError, "login.html", gin.H{
 			"message": "Something is wrong, please contact to administrator if the issue persists",
 		})

@@ -30,7 +30,7 @@ func RefreshHandler(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.CheckWhitelist(cookie); err != nil {
+	if err := service.CheckWhitelistRefreshToken(cookie); err != nil {
 		if !errors.Is(err, service.NotFoundError) {
 			utils.GetLogger().Event("check-whitelist-refresh-token-failed").
 				Field("cookie", cookie).Field("error", err).Debug()

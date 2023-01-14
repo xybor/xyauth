@@ -9,7 +9,11 @@ import (
 )
 
 func redirectToRefresh(ctx *gin.Context) {
-	ctx.Redirect(http.StatusTemporaryRedirect, "/refresh?redirect_uri="+ctx.Request.RequestURI)
+	uri, ok := ctx.GetQuery("redirect_uri")
+	if !ok {
+		uri = ctx.Request.RequestURI
+	}
+	ctx.Redirect(http.StatusTemporaryRedirect, "/refresh?redirect_uri="+uri)
 	ctx.Abort()
 }
 
