@@ -17,7 +17,10 @@ type RegisterParams struct {
 
 func RegisterHandler(ctx *gin.Context) {
 	params := new(RegisterParams)
-	ctx.ShouldBind(params)
+	if err := ctx.ShouldBind(params); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "invalid parameters"})
+		return
+	}
 
 	err := service.Register(params.Email, params.Password, params.Role)
 

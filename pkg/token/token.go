@@ -88,7 +88,6 @@ func Create(c Config) (string, error) {
 
 func Verify(s string, t Token) error {
 	parsedToken, err := jwt.ParseWithClaims(s, jwt.MapClaims{}, publicKeyFunc)
-
 	if err != nil {
 		if !errors.Is(err, TokenError) {
 			utils.GetLogger().Event("parse-token-error").Field("error", err).Debug()

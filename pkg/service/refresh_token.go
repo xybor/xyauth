@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CheckWhitelist(t string) error {
+func CheckWhitelistRefreshToken(t string) error {
 	err := database.GetMongoCollection(models.RefreshToken{}).FindOne(
 		context.Background(),
 		bson.D{{Key: "token", Value: t}},
@@ -24,9 +24,22 @@ func CheckWhitelist(t string) error {
 			utils.GetLogger().Event("check-whitelist-refresh-token-failed").
 				Field("error", err).Warning()
 		}
-		return NotFoundError.New("refresh token is revoked")
+		return NotFoundError.New("refresh token is revoked or never issued")
 	}
+	return nil
+}
 
+func RevokeRefreshToken(t string) error {
+	_, err := database.GetMongoCollection(models.RefreshToken{}).DeleteOne(
+		context.Background(),
+		bson.D{{Key: "token", Value: t}},
+	)
+
+	if err != nil {
+		utils.GetLogger().Event("revoke-refresh-token-failed").
+			Field("error", err).Warning()
+		return NotFoundError.New("refresh token can not be revoked")
+	}
 	return nil
 }
 
