@@ -12,8 +12,16 @@ import (
 
 func LogoutHandler(ctx *gin.Context) {
 	defer func() {
-		ctx.SetCookie("access_token", "", -1, "/", "", true, true)
-		ctx.SetCookie("refresh_token", "", -1, "/", "", true, true)
+		ctx.SetCookie(
+			"access_token", "", -1, "/",
+			utils.GetConfig().MustGet("server.domain").MustString(),
+			true, true)
+
+		ctx.SetCookie(
+			"refresh_token", "", -1, "/",
+			utils.GetConfig().MustGet("server.domain").MustString(),
+			true, true)
+
 		ctx.Redirect(http.StatusTemporaryRedirect, "/")
 	}()
 
