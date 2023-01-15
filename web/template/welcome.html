@@ -9,6 +9,8 @@
 	<!-- MATERIAL DESIGN ICONIC FONT -->
 	<link rel="stylesheet" href="/static/welcome/fonts/material-design-iconic-font/css/material-design-iconic-font.min.css">
 
+	<link rel="stylesheet" type="text/css" href="/static/login_register/vendor/bootstrap/css/bootstrap.min.css">
+
 	<!-- STYLE CSS -->
 	<link rel="stylesheet" href="/static/welcome/css/style.css">
 </head>
@@ -17,23 +19,41 @@
 	<div class="wrapper">
 		<div class="inner">
 			<h3> Hi {{ .name }} </h3>
-			<p> Welcome to xybor space, I am huykingsofm </p>
+			<p> Welcome to xybor space, we are huykingsofm and tuanhm11299 </p>
 			<p> Technology changes live, mindset changes every things </p>
-			<a href="https://github.com/huykingsofm">
-				<button> MY GITHUB </button>
-			</a>
-			<a href="https://github.com/xybor">
-				<button> XYBOR </button>
-			</a>
-			<a href="https://github.com/xybor-x">
-				<button> XYBOR-X </button>
-			</a>
-			<a href="logout?redirect_uri=/">
-				<button> Logout </button>
-			</a>
+			<div class="d-flex justify-content-between">
+				<a href="https://github.com/huykingsofm">
+					<button> Huy's GITHUB </button>
+				</a>
+				<a href="https://github.com/huykingsofm">
+					<button> Tuan's GITHUB </button>
+				</a>
+			</div>
+			
+			<div class="d-flex justify-content-between">
+				<a href="https://github.com/xybor">
+					<button> XYBOR </button>
+				</a>
+				<a href="https://github.com/xybor-x">
+					<button> XYBOR-X </button>
+				</a>
+			</div>
+
+			<div class="d-flex justify-content-center">
+				<a href="logout?redirect_uri=/">
+					<button> Logout </button>
+				</a>
+			</div>
+			
 		</div>
 	</div>
 
 </body><!-- This templates was made by Colorlib (https://colorlib.com) -->
 
 </html>
+
+<!--===============================================================================================-->
+<script src="/static/login_register/vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+<script src="/static/login_register/vendor/bootstrap/js/popper.js"></script>
+<script src="/static/login_register/vendor/bootstrap/js/bootstrap.min.js"></script>
