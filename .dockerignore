@@ -1,6 +1,7 @@
-test
-deploy
-LICENSE
-README.md
-Makefile
-CHANGELOG.md
+*
+!configs
+!cmd
+!internal
+!pkg
+!web
+!go.*

@@ -9,19 +9,18 @@ RUN go mod download
 
 COPY . ./
 
-RUN go build -o /server ./cmd/server/*.go \
- && go build -o /database ./cmd/database/*.go
-
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o /server ./cmd/server/*.go \
+ && CGO_ENABLED=0 go build -ldflags="-w -s" -o /database ./cmd/database/*.go
 
 FROM scratch
 
 ENV DOCKER_RUNNING=1
 WORKDIR /
 
-COPY --from=build /server /server
-COPY --from=build /database /database
+COPY --from=build /server /database /
+COPY --from=build /xyauth/configs /configs
+COPY --from=build /xyauth/web /web
 
 EXPOSE 8443
 
 ENTRYPOINT [ "/server" ]
-
