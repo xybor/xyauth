@@ -1,5 +1,7 @@
 FROM golang:1.18-alpine
 
+ENV DOCKER_RUNNING=1
+
 WORKDIR /xyauth
 
 COPY go.mod .
