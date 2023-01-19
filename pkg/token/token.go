@@ -7,19 +7,18 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/mitchellh/mapstructure"
 	"github.com/xybor-x/xycond"
-	"github.com/xybor/xyauth/internal/models"
-	"github.com/xybor/xyauth/internal/utils"
+	"github.com/xybor/xyauth/internal/config"
+	"github.com/xybor/xyauth/internal/logger"
 )
 
-var issuer = utils.GetConfig().GetDefault("oauth.issuer", "xyauth").MustString()
+var issuer = config.GetDefault("oauth.issuer", "xyauth").MustString()
 
 var privateKey *rsa.PrivateKey
 var publicKey *rsa.PublicKey
-var AccessTokenExpiration = utils.GetConfig().GetDefault(
+var AccessTokenExpiration = config.GetDefault(
 	"oauth.access_token_expiration", 5*time.Minute).MustDuration()
-var RefreshTokenExpiration = utils.GetConfig().GetDefault(
+var RefreshTokenExpiration = config.GetDefault(
 	"oauth.refresh_token_expiration", 5*time.Minute).MustDuration()
 
 func publicKeyFunc(t *jwt.Token) (interface{}, error) {
@@ -33,41 +32,17 @@ func init() {
 	// TODO: ReplaceAll commands will be removed if the PR 156 of godotenv is
 	// merged.
 	var err error
-	key := utils.GetConfig().MustGet("OAUTH_PRIVATE_KEY").MustString()
+	key := config.MustGet("OAUTH_PRIVATE_KEY").MustString()
 	privateKey, err = jwt.ParseRSAPrivateKeyFromPEM([]byte(strings.ReplaceAll(key, `\n`, "\n")))
 	xycond.AssertNil(err)
 
-	key = utils.GetConfig().MustGet("OAUTH_PUBLIC_KEY").MustString()
+	key = config.MustGet("OAUTH_PUBLIC_KEY").MustString()
 	publicKey, err = jwt.ParseRSAPublicKeyFromPEM([]byte(strings.ReplaceAll(key, `\n`, "\n")))
 	xycond.AssertNil(err)
 }
 
-type Token interface {
-	Unmarshal(payload any) error
-}
-
-type AccessToken struct {
-	models.User
-}
-
-func (t *AccessToken) Unmarshal(payload any) error {
-	if err := mapstructure.Decode(payload, &t.User); err != nil {
-		return TokenError.New("can not parse to access token")
-	}
-	return nil
-}
-
-type RefreshToken struct {
-	Email string
-}
-
-func (t *RefreshToken) Unmarshal(payload any) error {
-	if err := mapstructure.Decode(payload, t); err != nil {
-		return TokenError.New("can not parse to refresh token")
-	}
-	return nil
-}
-
+// Create creates a string that represents for the token with the given
+// configuration.
 func Create(c Config) (string, error) {
 	claims := jwt.MapClaims{
 		"sub": c.payload,
@@ -78,7 +53,7 @@ func Create(c Config) (string, error) {
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodRS256, claims).SignedString(privateKey)
 	if err != nil {
-		utils.GetLogger().Event("create-token-error").
+		logger.Event("create-token-error").
 			Field("claims", claims).Field("error", err).Warning()
 		return "", TokenError.New("can not create token")
 	}
@@ -86,11 +61,17 @@ func Create(c Config) (string, error) {
 	return token, nil
 }
 
+type Token interface {
+	Unmarshal(payload any) error
+}
+
+// Verify checks if s is a valid token, then parse it to Token t. Parameter t
+// must be a pointer to Token struct.
 func Verify(s string, t Token) error {
 	parsedToken, err := jwt.ParseWithClaims(s, jwt.MapClaims{}, publicKeyFunc)
 	if err != nil {
 		if !errors.Is(err, TokenError) {
-			utils.GetLogger().Event("parse-token-error").Field("error", err).Debug()
+			logger.Event("parse-token-error").Field("error", err).Debug()
 			err = TokenError.New("can not parse the token")
 		}
 		return err

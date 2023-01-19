@@ -7,7 +7,8 @@ import (
 	"text/template"
 
 	"github.com/spf13/cobra"
-	"github.com/xybor/xyauth/internal/utils"
+	"github.com/xybor/xyauth/internal/config"
+	"github.com/xybor/xyauth/internal/logger"
 )
 
 var output string
@@ -21,12 +22,12 @@ var rootCmd = &cobra.Command{
 		src := args[0]
 		t, err := template.ParseFiles(src)
 		if err != nil {
-			utils.GetLogger().Event("can-not-parse-file").Field("error", err).Fatal()
+			logger.Event("can-not-parse-file").Field("error", err).Fatal()
 		}
 
 		fin, err := os.Stat(src)
 		if err != nil {
-			utils.GetLogger().Event("invalid-input-file").Field("error", err).Fatal()
+			logger.Event("invalid-input-file").Field("error", err).Fatal()
 		}
 
 		if output == "" {
@@ -39,17 +40,17 @@ var rootCmd = &cobra.Command{
 
 		fout, err := os.OpenFile(output, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, fin.Mode())
 		if err != nil {
-			utils.GetLogger().Event("failed-to-open-output").Field("error", err).Fatal()
+			logger.Event("failed-to-open-output").Field("error", err).Fatal()
 		}
 
 		for i := range configs {
-			if err := utils.AddConfig(configs[i]); err != nil {
-				utils.GetLogger().Event("add-config-error").Field("error", err).Fatal()
+			if err := config.Add(configs[i]); err != nil {
+				logger.Event("add-config-error").Field("error", err).Fatal()
 			}
 		}
 
-		if err := t.Execute(fout, utils.GetConfig().ToMap()); err != nil {
-			utils.GetLogger().Event("failed-to-execute-template").Field("error", err).Fatal()
+		if err := t.Execute(fout, config.ToMap()); err != nil {
+			logger.Event("failed-to-execute-template").Field("error", err).Fatal()
 		}
 
 		fmt.Println("Generate file successfully")
@@ -60,6 +61,6 @@ func main() {
 	rootCmd.Flags().StringVarP(&output, "output", "o", "", "Specifiy the output path")
 	rootCmd.Flags().StringArrayVarP(&configs, "config", "c", nil, "Specify overridden config files")
 	if err := rootCmd.Execute(); err != nil {
-		utils.GetLogger().Event("template-command-error").Field("error", err).Fatal()
+		logger.Event("template-command-error").Field("error", err).Fatal()
 	}
 }

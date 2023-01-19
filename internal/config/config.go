@@ -1,4 +1,4 @@
-package utils
+package config
 
 import (
 	"log"
@@ -8,7 +8,7 @@ import (
 
 var config *xyconfig.Config
 
-func initConfig() {
+func init() {
 	config = xyconfig.GetConfig("xyauth")
 
 	if err := config.ReadFile("configs/default.ini", true); err != nil {
@@ -27,10 +27,26 @@ func initConfig() {
 	}
 }
 
-func AddConfig(f string) error {
-	return GetConfig().ReadFile(f, true)
+func Add(f string) error {
+	return config.ReadFile(f, true)
 }
 
-func GetConfig() *xyconfig.Config {
-	return config
+func Get(name string) (xyconfig.Value, bool) {
+	return config.Get(name)
+}
+
+func GetDefault(name string, def any) xyconfig.Value {
+	return config.GetDefault(name, def)
+}
+
+func MustGet(name string) xyconfig.Value {
+	return config.MustGet(name)
+}
+
+func ToMap() map[string]any {
+	return config.ToMap()
+}
+
+func AddHook(key string, f func(xyconfig.Event)) {
+	config.AddHook(key, f)
 }

@@ -2,6 +2,7 @@ package models
 
 import "github.com/xybor-x/xyerror"
 
+// Errors of models.
 var (
 	DatabaseError   = xyerror.NewException("DatabaseError")
 	ValueError      = DatabaseError.NewException("ValueError")

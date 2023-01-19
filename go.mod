@@ -3,6 +3,8 @@ module github.com/xybor/xyauth
 go 1.18
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/agiledragon/gomonkey/v2 v2.9.0
 	github.com/gin-gonic/gin v1.8.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jackc/pgx/v5 v5.2.0
@@ -12,6 +14,7 @@ require (
 	github.com/xybor-x/xyconfig v1.3.2
 	github.com/xybor-x/xyerror v1.0.5
 	github.com/xybor-x/xylog v0.5.0
+	github.com/xybor-x/xypriv v0.0.0-20230117160404-66f32c9cd7f7
 	go.mongodb.org/mongo-driver v1.11.1
 	golang.org/x/crypto v0.4.0
 	gorm.io/driver/postgres v1.4.6

@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/xybor/xyauth/internal/utils"
+	"github.com/xybor/xyauth/internal/config"
 )
 
 var Configuration = make(map[string]any)
 
 func init() {
-	domain := utils.GetConfig().MustGet("server.domain").MustString()
-	port := utils.GetConfig().MustGet("server.port").MustString()
+	domain := config.MustGet("server.domain").MustString()
+	port := config.MustGet("server.port").MustString()
 	issuer := "https://" + domain
 	if port != "443" {
 		issuer += ":" + port

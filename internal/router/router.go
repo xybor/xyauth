@@ -2,15 +2,17 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/xybor/xyauth/internal/config"
 	apiv1 "github.com/xybor/xyauth/internal/handlers/api/v1"
 	appv1 "github.com/xybor/xyauth/internal/handlers/app/v1"
 	"github.com/xybor/xyauth/internal/handlers/well_known/openid"
+	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/internal/middlewares"
-	"github.com/xybor/xyauth/internal/utils"
 )
 
+// New returns a new router.
 func New() *gin.Engine {
-	env := utils.GetConfig().GetDefault("general.environment", "dev").MustString()
+	env := config.GetDefault("general.environment", "dev").MustString()
 	switch env {
 	case "dev":
 		gin.SetMode(gin.DebugMode)
@@ -19,7 +21,7 @@ func New() *gin.Engine {
 	case "prod":
 		gin.SetMode(gin.ReleaseMode)
 	default:
-		utils.GetLogger().Event("invalid-environment").Field("env", env).Panic()
+		logger.Event("invalid-environment").Field("env", env).Panic()
 	}
 
 	router := gin.Default()
@@ -28,20 +30,20 @@ func New() *gin.Engine {
 	router.StaticFile("/favicon.ico", "web/static/favicon.ico")
 	router.LoadHTMLGlob("web/template/*.html")
 
-	router.GET(".well-known/openid-configuration", openid.Handler)
-	router.GET("login", appv1.LoginGETHandler)
-	router.GET("register", appv1.RegisterGETHandler)
-	router.GET("refresh", appv1.RefreshHandler)
-	router.GET("logout", appv1.LogoutHandler)
+	router.Use(middlewares.VerifyAccessToken)
 
+	router.GET(".well-known/openid-configuration", openid.Handler)
+
+	router.GET("login", appv1.LoginGETHandler)
 	router.POST("login", appv1.LoginPOSTHandler)
+
+	router.GET("register", appv1.RegisterGETHandler)
 	router.POST("register", appv1.RegisterPOSTHandler)
 
-	mustAuthGroup := router.Group("")
-	mustAuthGroup.Use(middlewares.VerifyAccessToken)
-	{
-		mustAuthGroup.GET("", appv1.WelcomeHandler)
-	}
+	router.GET("", appv1.WelcomeHandler)
+	router.GET("logout", appv1.LogoutHandler)
+
+	router.Any("refresh", appv1.RefreshHandler)
 
 	apiv1Group := router.Group("api/v1")
 	{

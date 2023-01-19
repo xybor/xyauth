@@ -2,13 +2,22 @@
 
 Xyauth acts as an authentication provider which is compatible with oauth2 and openid.
 
-# Technique
+# Techniques
 
 - Language: Golang, HTML, CSS, Javascript.
-- Database: PostgreSQL, MongoDB.
+- Database: PostgreSQL, MongoDB. // Redis
 - Deployment: Docker, Docker Compose.
+- Cloud: AWS.
+- Others:
 
-// - Cloud: AWS.
+  - xypriv: privilege management library.
+  - xyconfig: config reader library.
+  - xylog: logging library.
+  - gorm: ORM library.
+  - sql-mock: mocking for sql database system.
+  - gomonkey: library of monkey patching in unit tests.
+  - gin: web framework.
+  - cobra: commandline library.
 
 # Get started
 

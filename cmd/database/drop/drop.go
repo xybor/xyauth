@@ -4,8 +4,9 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
+	"github.com/xybor/xyauth/internal/config"
 	"github.com/xybor/xyauth/internal/database"
-	"github.com/xybor/xyauth/internal/utils"
+	"github.com/xybor/xyauth/internal/logger"
 )
 
 var sql bool
@@ -16,23 +17,23 @@ var Command = &cobra.Command{
 	Short: "Drop all tables",
 	Args:  cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		if utils.GetConfig().GetDefault("general.environment", "dev").MustString() != "dev" {
+		if config.GetDefault("general.environment", "dev").MustString() != "dev" {
 			fmt.Println("Only allow dropping the table if the environment is dev")
 			return
 		}
 
 		if sql {
 			if err := database.DropAllSQL(); err != nil {
-				utils.GetLogger().Event("drop-sql-error").Field("error", err).Fatal()
+				logger.Event("drop-sql-error").Field("error", err).Fatal()
 			}
-			fmt.Println("Drop all SQL tables successfully")
+			logger.Event("drop-sql-success").Info()
 		}
 
 		if nosql {
 			if err := database.DropAllNoSQL(); err != nil {
-				utils.GetLogger().Event("drop-nosql-error").Field("error", err).Fatal()
+				logger.Event("drop-nosql-error").Field("error", err).Fatal()
 			}
-			fmt.Println("Drop all NoSQL collections successfully")
+			logger.Event("drop-nosql-success").Info()
 		}
 	},
 }

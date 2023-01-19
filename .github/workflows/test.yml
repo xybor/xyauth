@@ -21,6 +21,6 @@ jobs:
 
     - name: Test
       run: go test -timeout 30s -v -race ./...
-      env:        
-        OAUTH_PRIVATE_KEY: ${secrets.OAUTH_PRIVATE_KEY}
-        OAUTH_PUBLIC_KEY: ${secrets.OAUTH_PUBLIC_KEY}
+      env:
+        OAUTH_PRIVATE_KEY: ${{ secrets.OAUTH_PRIVATE_KEY }}
+        OAUTH_PUBLIC_KEY: ${{ secrets.OAUTH_PUBLIC_KEY }}

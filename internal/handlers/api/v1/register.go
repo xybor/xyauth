@@ -6,6 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xybor-x/xyerror"
+	"github.com/xybor-x/xypriv"
+	"github.com/xybor/xyauth/internal/utils"
 	"github.com/xybor/xyauth/pkg/service"
 )
 
@@ -22,8 +24,13 @@ func RegisterHandler(ctx *gin.Context) {
 		return
 	}
 
-	err := service.Register(params.Email, params.Password, params.Role)
+	table := xypriv.AbstractResource("user_credential_table")
+	if utils.Check(ctx).Perform("create", params.Role).On(table) != nil {
+		ctx.JSON(http.StatusForbidden, gin.H{"message": "permission denied"})
+		return
+	}
 
+	err := service.Register(params.Email, params.Password, params.Role)
 	switch {
 	case errors.Is(err, service.DuplicatedError):
 		ctx.JSON(http.StatusConflict, gin.H{"message": xyerror.Message(err)})
