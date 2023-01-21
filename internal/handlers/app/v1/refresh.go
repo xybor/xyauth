@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/xybor/xyauth/internal/utils"
+	"github.com/xybor/xyauth/internal/config"
+	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/pkg/service"
 	"github.com/xybor/xyauth/pkg/token"
 )
@@ -24,7 +25,7 @@ func RefreshHandler(ctx *gin.Context) {
 
 	refreshToken := token.RefreshToken{}
 	if err := token.Verify(cookie, &refreshToken); err != nil {
-		utils.GetLogger().Event("refresh-token-invalid").
+		logger.Event("refresh-token-invalid").
 			Field("cookie", cookie).Field("error", err).Debug()
 		redirectToLogin(ctx)
 		return
@@ -32,7 +33,7 @@ func RefreshHandler(ctx *gin.Context) {
 
 	if err := service.CheckWhitelistRefreshToken(cookie); err != nil {
 		if !errors.Is(err, service.NotFoundError) {
-			utils.GetLogger().Event("check-whitelist-refresh-token-failed").
+			logger.Event("check-whitelist-refresh-token-failed").
 				Field("cookie", cookie).Field("error", err).Debug()
 		}
 		redirectToLogin(ctx)
@@ -41,7 +42,7 @@ func RefreshHandler(ctx *gin.Context) {
 
 	value, err := service.CreateAccessToken(refreshToken.Email)
 	if err != nil {
-		utils.GetLogger().Event("create-access-token-failed").
+		logger.Event("create-access-token-failed").
 			Field("email", refreshToken.Email).Field("error", err).Warning()
 		redirectToLogin(ctx)
 		return
@@ -50,7 +51,7 @@ func RefreshHandler(ctx *gin.Context) {
 	ctx.SetCookie(
 		"access_token", value,
 		int(token.AccessTokenExpiration/time.Second), "/",
-		utils.GetConfig().MustGet("server.domain").MustString(),
+		config.MustGet("server.domain").MustString(),
 		true, true,
 	)
 
@@ -58,5 +59,5 @@ func RefreshHandler(ctx *gin.Context) {
 	if !ok {
 		uri = ""
 	}
-	ctx.Redirect(http.StatusMovedPermanently, uri)
+	ctx.Redirect(http.StatusTemporaryRedirect, uri)
 }

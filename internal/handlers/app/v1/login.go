@@ -7,6 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xybor-x/xyerror"
+	"github.com/xybor/xyauth/internal/config"
+	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/internal/utils"
 	"github.com/xybor/xyauth/pkg/service"
 	"github.com/xybor/xyauth/pkg/token"
@@ -18,7 +20,11 @@ type LoginParams struct {
 }
 
 func LoginGETHandler(ctx *gin.Context) {
-	ctx.HTML(http.StatusOK, "login.html", nil)
+	if _, ok := utils.GetAccessToken(ctx); ok {
+		ctx.Redirect(http.StatusTemporaryRedirect, "")
+	} else {
+		ctx.HTML(http.StatusOK, "login.html", nil)
+	}
 }
 
 func LoginPOSTHandler(ctx *gin.Context) {
@@ -33,7 +39,7 @@ func LoginPOSTHandler(ctx *gin.Context) {
 		case errors.Is(err, service.CredentialError):
 			ctx.HTML(http.StatusForbidden, "login.html", gin.H{"message": xyerror.Message(err)})
 		case err != nil:
-			utils.GetLogger().Event("query-user-failed").
+			logger.Event("query-user-failed").
 				Field("email", params.Email).Field("error", err).Warning()
 			ctx.HTML(http.StatusInternalServerError, "login.html", gin.H{
 				"message": "Something is wrong, please contact to administrator if the issue persists",
@@ -41,8 +47,6 @@ func LoginPOSTHandler(ctx *gin.Context) {
 		}
 		return
 	}
-
-	utils.GetLogger().Event("authenticate-success").Field("email", params.Email).Debug()
 
 	accessToken, err := service.CreateAccessToken(params.Email)
 	if err != nil {
@@ -63,14 +67,14 @@ func LoginPOSTHandler(ctx *gin.Context) {
 	ctx.SetCookie(
 		"access_token", accessToken,
 		int(token.AccessTokenExpiration/time.Second), "/",
-		utils.GetConfig().GetDefault("server.domain", "localhost").MustString(),
+		config.GetDefault("server.domain", "localhost").MustString(),
 		true, true,
 	)
 
 	ctx.SetCookie(
 		"refresh_token", refreshToken,
 		int(token.RefreshTokenExpiration/time.Second), "/",
-		utils.GetConfig().GetDefault("server.domain", "localhost").MustString(),
+		config.GetDefault("server.domain", "localhost").MustString(),
 		true, true,
 	)
 

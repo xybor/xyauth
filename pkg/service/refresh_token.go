@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/xybor/xyauth/internal/database"
+	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/internal/models"
-	"github.com/xybor/xyauth/internal/utils"
 	"github.com/xybor/xyauth/pkg/token"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -21,7 +21,7 @@ func CheckWhitelistRefreshToken(t string) error {
 
 	if err != nil {
 		if !errors.Is(err, mongo.ErrNoDocuments) {
-			utils.GetLogger().Event("check-whitelist-refresh-token-failed").
+			logger.Event("check-whitelist-refresh-token-failed").
 				Field("error", err).Warning()
 		}
 		return NotFoundError.New("refresh token is revoked or never issued")
@@ -36,7 +36,7 @@ func RevokeRefreshToken(t string) error {
 	)
 
 	if err != nil {
-		utils.GetLogger().Event("revoke-refresh-token-failed").
+		logger.Event("revoke-refresh-token-failed").
 			Field("error", err).Warning()
 		return NotFoundError.New("refresh token can not be revoked")
 	}
@@ -50,9 +50,9 @@ func JanitorRefreshToken() {
 	)
 
 	if err != nil {
-		utils.GetLogger().Event("janitor-refresh-token-failed").Field("error", err).Warning()
+		logger.Event("janitor-refresh-token-failed").Field("error", err).Warning()
 	} else {
-		utils.GetLogger().Event("janitor-refresh-token").Field("deleted_count", r.DeletedCount).Info()
+		logger.Event("janitor-refresh-token").Field("deleted_count", r.DeletedCount).Info()
 	}
 
 	time.AfterFunc(token.RefreshTokenExpiration, JanitorRefreshToken)

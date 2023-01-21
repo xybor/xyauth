@@ -4,9 +4,37 @@ import (
 	"reflect"
 	"unicode"
 
+	"github.com/gin-gonic/gin"
 	"github.com/xybor-x/xyerror"
+	"github.com/xybor-x/xypriv"
+	"github.com/xybor/xyauth/internal/logger"
+	"github.com/xybor/xyauth/pkg/token"
 )
 
+// Check returns a privilege Checker. If the access token is available, the
+// User will delegate its privilege to access token. Otherwise, the Checker will
+// check with the nil subject.
+func Check(ctx *gin.Context) *xypriv.Checker {
+	if accessToken, ok := GetAccessToken(ctx); ok {
+		return xypriv.Check(accessToken.User).Delegate(accessToken)
+	}
+	return xypriv.Check(nil)
+}
+
+// GetAccessToken returns the AccessToken in context. If the AccessToken does
+// not exist, return (empty token, false)
+func GetAccessToken(ctx *gin.Context) (token.AccessToken, bool) {
+	if val, ok := ctx.Get("accessToken"); ok {
+		if accessToken, ok := val.(token.AccessToken); ok {
+			return accessToken, true
+		}
+		logger.Event("invalid-access-token").Field("token", val).Warning()
+	}
+	return token.AccessToken{}, false
+}
+
+// GetSnakeCase returns the name of struct, pointer of struct, or string under
+// snake case format.
 func GetSnakeCase(a any) (string, error) {
 	t := reflect.TypeOf(a)
 	name := ""

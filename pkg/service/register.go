@@ -6,8 +6,8 @@ import (
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/xybor/xyauth/internal/database"
+	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/internal/models"
-	"github.com/xybor/xyauth/internal/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -44,7 +44,7 @@ func Register(email, password, role string) error {
 			return DuplicatedError.Newf("duplicated user %s", email)
 		}
 
-		utils.GetLogger().Event("register-failed").
+		logger.Event("register-failed").
 			Field("email", email).Field("role", role).Field("error", err).Warning()
 		return ServiceError.New("failed to register")
 	}
@@ -52,11 +52,15 @@ func Register(email, password, role string) error {
 	return nil
 }
 
+var roles = []string{"admin", "mod", "user"}
+
 func checkRole(role string) error {
-	if role != "admin" && role != "user" {
-		return ValueError.Newf("invalid role %s", role)
+	for i := range roles {
+		if role == roles[i] {
+			return nil
+		}
 	}
-	return nil
+	return ValueError.Newf("invalid role %s", role)
 }
 
 func checkEmail(email string) error {
@@ -75,7 +79,7 @@ func checkAndHashPassword(pwd string) (string, error) {
 
 	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 	if err != nil {
-		utils.GetLogger().Event("invalid-password-format").
+		logger.Event("invalid-password-format").
 			Field("password", pwd).
 			Field("error", err).Debug()
 		return "", EncryptionError.New("password is invalid format")

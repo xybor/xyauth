@@ -5,7 +5,7 @@ import (
 	"github.com/xybor-x/xycond"
 	"github.com/xybor/xyauth/cmd/database/drop"
 	"github.com/xybor/xyauth/internal/database"
-	"github.com/xybor/xyauth/internal/utils"
+	"github.com/xybor/xyauth/internal/logger"
 )
 
 var rootCmd = &cobra.Command{
@@ -21,6 +21,6 @@ func main() {
 	xycond.AssertNil(database.InitMongoDB())
 
 	if err := rootCmd.Execute(); err != nil {
-		utils.GetLogger().Event("database-command-error").Field("error", err).Fatal()
+		logger.Event("database-command-error").Field("error", err).Fatal()
 	}
 }

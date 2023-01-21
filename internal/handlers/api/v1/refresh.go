@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xybor-x/xyerror"
-	"github.com/xybor/xyauth/internal/utils"
+	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/pkg/service"
 	"github.com/xybor/xyauth/pkg/token"
 )
@@ -28,7 +28,7 @@ func RefreshHandler(ctx *gin.Context) {
 		if errors.Is(err, token.TokenError) {
 			ctx.JSON(http.StatusForbidden, gin.H{"message": xyerror.Message(err)})
 		} else {
-			utils.GetLogger().Event("refresh-token-invalid").
+			logger.Event("refresh-token-invalid").
 				Field("token", params.RefreshToken).Field("error", err).Warning()
 			ctx.Status(http.StatusInternalServerError)
 		}
@@ -39,7 +39,7 @@ func RefreshHandler(ctx *gin.Context) {
 		if errors.Is(err, service.NotFoundError) {
 			ctx.JSON(http.StatusForbidden, gin.H{"message": xyerror.Message(err)})
 		} else {
-			utils.GetLogger().Event("check-whitelist-refresh-token-failed").
+			logger.Event("check-whitelist-refresh-token-failed").
 				Field("token", params.RefreshToken).Field("error", err).Warning()
 			ctx.Status(http.StatusInternalServerError)
 		}

@@ -1,30 +1,29 @@
 package database
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
+	"github.com/xybor/xyauth/internal/config"
+	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/internal/models"
-	"github.com/xybor/xyauth/internal/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	gormlog "gorm.io/gorm/logger"
 )
 
 var postgresDB *gorm.DB
-var config = utils.GetConfig()
 
 // InitPostgresDB inits the db with Gorm. The parameter p is using only for testing.
 func InitPostgresDB(p gorm.ConnPool) error {
-	loglevel := config.GetDefault("postgresql.loglevel", logger.Info).MustInt()
-	newLogger := logger.New(
+	loglevel := config.GetDefault("postgresql.loglevel", int(gormlog.Warn)).MustInt()
+	newLogger := gormlog.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
-		logger.Config{
+		gormlog.Config{
 			SlowThreshold:             time.Second,
-			LogLevel:                  logger.LogLevel(loglevel),
+			LogLevel:                  gormlog.LogLevel(loglevel),
 			IgnoreRecordNotFoundError: true,
 		},
 	)
@@ -63,7 +62,7 @@ func InitPostgresDB(p gorm.ConnPool) error {
 		if err == nil {
 			break
 		}
-		utils.GetLogger().Event("connect-to-database-failed").Field("error", err).Error()
+		logger.Event("connect-to-database-failed").Field("error", err).Error()
 		time.Sleep(retryDuration)
 	}
 
@@ -75,7 +74,7 @@ func InitPostgresDB(p gorm.ConnPool) error {
 		return err
 	}
 
-	utils.GetLogger().Event("connect-to-postgresql").
+	logger.Event("connect-to-postgresql").
 		Field("host", host).Field("port", port).Info()
 
 	return nil
@@ -87,13 +86,4 @@ func GetPostgresDB() *gorm.DB {
 
 func DropAllSQL() error {
 	return postgresDB.Migrator().DropTable(models.AllSQL...)
-}
-
-func DropAllNoSQL() error {
-	for _, a := range models.AllNoSQL {
-		if err := GetMongoCollection(a).Drop(context.Background()); err != nil {
-			return err
-		}
-	}
-	return nil
 }

@@ -1,37 +1,31 @@
 package middlewares
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
-	"github.com/xybor/xyauth/internal/utils"
+	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/pkg/token"
 )
 
-func redirectToRefresh(ctx *gin.Context) {
-	uri, ok := ctx.GetQuery("redirect_uri")
-	if !ok {
-		uri = ctx.Request.RequestURI
-	}
-	ctx.Redirect(http.StatusTemporaryRedirect, "/refresh?redirect_uri="+uri)
-	ctx.Abort()
+type BearerTokenParam struct {
+	AccessToken string `json:"access_token" binding:"required"`
 }
 
+// VerifyAccessToken verifies the access token in cookies, then adds it into the
+// context.
 func VerifyAccessToken(ctx *gin.Context) {
-	cookie, err := ctx.Cookie("access_token")
-	if err != nil {
-		redirectToRefresh(ctx)
-		return
+	params := BearerTokenParam{}
+	if err := ctx.ShouldBind(&params); err != nil {
+		if params.AccessToken, err = ctx.Cookie("access_token"); err != nil {
+			return
+		}
 	}
 
 	accessToken := token.AccessToken{}
-	if err := token.Verify(cookie, &accessToken); err != nil {
-		utils.GetLogger().Event("access-token-invalid").
-			Field("cookie", cookie).Field("error", err).Debug()
-		redirectToRefresh(ctx)
+	if err := token.Verify(params.AccessToken, &accessToken); err != nil {
+		logger.Event("access-token-invalid").
+			Field("token", params.AccessToken).Field("error", err).Debug()
 		return
 	}
 
 	ctx.Set("accessToken", accessToken)
-	ctx.Next()
 }
