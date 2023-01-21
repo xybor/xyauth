@@ -1,0 +1,144 @@
+/*custom fonts*/
+@font-face {
+    font-family: 'Poppins Regular';
+    src: url('../font/Poppins-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins Black';
+    src: url('../font/Poppins-Black.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins Bold';
+    src: url('../font/Poppins-Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins ExtraBold';
+    src: url('../font/Poppins-ExtraBold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins Light';
+    src: url('../font/Poppins-Light.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins Medium';
+    src: url('../font/Poppins-Medium.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins SemiBold';
+    src: url('../font/Poppins-SemiBold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins Thin';
+    src: url('../font/Poppins-Thin.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins ExtraLight';
+    src: url('../font/Poppins-ExtraLight.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+/*end custom fonts*/
+
+:root {
+    --bs-primary: #2C3878 !important;
+    --bs-light: #FFFFFF !important;
+    --header-height: 80px;
+    --footer-min-height: 150px;
+}
+
+main {
+    min-height: calc(100vh - var(--footer-min-height));
+    padding-top: var(--header-height);
+    /* padding-bottom: var(--footer-min-height); */
+}
+
+section {
+    flex-grow: 1;
+}
+
+header nav {
+    min-height: var(--header-height);
+}
+
+footer {
+    min-height: var(--footer-min-height);
+}
+
+body {
+    font-family: 'Poppins Regular', Arial, Helvetica, sans-serif;
+}
+
+a.navbar-brand {
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #000;
+  }
+
+.btn-primary, .btn-primary:hover {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+}
+
+.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+
+.bg-light {
+    background-color: var(--bs-light) !important;
+}
+
+.footer {
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 27px;
+  }
+
+  .background-overlay .background-overlay__image
+{
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: bottom;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+}
+
+.fw-bold {
+    font-family: 'Poppins Bold';
+}
+
+.fw-medium {
+    font-family: 'Poppins Medium';
+}
