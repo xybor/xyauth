@@ -33,6 +33,19 @@ func GetAccessToken(ctx *gin.Context) (token.AccessToken, bool) {
 	return token.AccessToken{}, false
 }
 
+// IsAuthenticated returns true if the context has access token or refresh token.
+func IsAuthenticated(ctx *gin.Context) bool {
+	if val, err := ctx.Cookie("access_token"); err == nil && val != "" {
+		return true
+	}
+
+	if val, err := ctx.Cookie("refresh_token"); err == nil && val != "" {
+		return true
+	}
+
+	return false
+}
+
 // GetSnakeCase returns the name of struct, pointer of struct, or string under
 // snake case format.
 func GetSnakeCase(a any) (string, error) {
