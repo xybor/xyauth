@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/xybor-x/xyerror"
 	"github.com/xybor-x/xypriv"
 	"github.com/xybor/xyauth/internal/utils"
@@ -12,14 +13,14 @@ import (
 )
 
 type RegisterParams struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
 	Role     string `json:"role"`
 }
 
 func RegisterHandler(ctx *gin.Context) {
 	params := new(RegisterParams)
-	if err := ctx.ShouldBind(params); err != nil {
+	if err := ctx.ShouldBindBodyWith(params, binding.JSON); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "invalid parameters"})
 		return
 	}

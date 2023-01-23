@@ -2,14 +2,14 @@ package v1
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/xybor/xyauth/internal/config"
 	"github.com/xybor/xyauth/internal/logger"
+	"github.com/xybor/xyauth/internal/token"
+	"github.com/xybor/xyauth/internal/utils"
 	"github.com/xybor/xyauth/pkg/service"
-	"github.com/xybor/xyauth/pkg/token"
 )
 
 func redirectToLogin(ctx *gin.Context) {
@@ -31,29 +31,34 @@ func RefreshHandler(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.CheckWhitelistRefreshToken(cookie); err != nil {
-		if !errors.Is(err, service.NotFoundError) {
-			logger.Event("check-whitelist-refresh-token-failed").
-				Field("cookie", cookie).Field("error", err).Debug()
+	newRefreshToken, err := service.InheritRefreshToken(refreshToken)
+	if err != nil {
+		if errors.Is(err, service.SecurityError) {
+			utils.SetCookie(ctx, "access_token", "", -1)
+			utils.SetCookie(ctx, "refresh_token", "", -1)
+		} else {
+			logger.Event("inherit-refresh-token-failed").
+				Field("email", refreshToken.Email).Field("error", err).Warning()
 		}
-		redirectToLogin(ctx)
+
+		ctx.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"message": fmt.Sprintf("500 Internal Server Error (%s)", err),
+		})
 		return
 	}
 
-	value, err := service.CreateAccessToken(refreshToken.Email)
+	accessToken, err := service.CreateAccessToken(refreshToken.Email)
 	if err != nil {
 		logger.Event("create-access-token-failed").
 			Field("email", refreshToken.Email).Field("error", err).Warning()
-		redirectToLogin(ctx)
+		ctx.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"message": "500 Internal Server Error (can not create access token)",
+		})
 		return
 	}
 
-	ctx.SetCookie(
-		"access_token", value,
-		int(token.AccessTokenExpiration/time.Second), "/",
-		config.MustGet("server.domain").MustString(),
-		true, true,
-	)
+	utils.SetCookie(ctx, "access_token", accessToken, token.AccessTokenExpiration)
+	utils.SetCookie(ctx, "refresh_token", newRefreshToken, token.RefreshTokenExpiration)
 
 	uri, ok := ctx.GetQuery("redirect_uri")
 	if !ok {

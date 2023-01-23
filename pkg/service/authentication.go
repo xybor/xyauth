@@ -1,14 +1,12 @@
 package service
 
 import (
-	"context"
 	"errors"
-	"time"
 
 	"github.com/xybor/xyauth/internal/database"
 	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/internal/models"
-	"github.com/xybor/xyauth/pkg/token"
+	"github.com/xybor/xyauth/internal/token"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -56,27 +54,4 @@ func CreateAccessToken(email string) (string, error) {
 	}
 
 	return token, nil
-}
-
-func CreateRefreshToken(email string) (string, error) {
-	value, err := token.Create(token.NewRefreshTokenConfig(email))
-	if err != nil {
-		return "", err
-	}
-
-	_, err = database.GetMongoCollection(models.RefreshToken{}).InsertOne(
-		context.Background(), models.RefreshToken{
-			Email:      email,
-			Token:      value,
-			Expiration: time.Now().Add(token.RefreshTokenExpiration),
-		},
-	)
-
-	if err != nil {
-		logger.Event("whitelist-refresh-token-failed").
-			Field("token", value).Field("error", err).Error()
-		return "", ServiceError.New("can not insert refresh token")
-	}
-
-	return value, nil
 }

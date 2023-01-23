@@ -7,7 +7,9 @@ import (
 )
 
 type RefreshToken struct {
-	Email string
+	Email  string
+	Family string
+	ID     int // The id of token in its family
 }
 
 func (t *RefreshToken) Unmarshal(payload any) error {

@@ -18,9 +18,9 @@ func NewAccessTokenConfig(u models.User) Config {
 	}
 }
 
-func NewRefreshTokenConfig(email string) Config {
+func NewRefreshTokenConfig(email, family string, familyID int) Config {
 	return Config{
-		payload:    RefreshToken{Email: email},
+		payload:    RefreshToken{Email: email, Family: family, ID: familyID},
 		expiration: RefreshTokenExpiration,
 	}
 }
