@@ -11,7 +11,7 @@ var Configuration = make(map[string]any)
 
 func init() {
 	domain := config.MustGet("server.domain").MustString()
-	port := config.MustGet("server.port").MustString()
+	port := config.MustGet("server.tls_port").MustString()
 	issuer := "https://" + domain
 	if port != "443" {
 		issuer += ":" + port

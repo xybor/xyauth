@@ -10,6 +10,7 @@ require (
 	github.com/jackc/pgx/v5 v5.2.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/cobra v1.6.1
+	github.com/unrolled/secure v1.13.0
 	github.com/xybor-x/xycond v1.0.0
 	github.com/xybor-x/xyconfig v1.3.2
 	github.com/xybor-x/xyerror v1.0.5

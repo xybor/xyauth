@@ -10,8 +10,8 @@ import (
 	"github.com/xybor/xyauth/internal/middlewares"
 )
 
-// New returns a new router.
-func New() *gin.Engine {
+// NewHTTPS returns a new router for HTTPS.
+func NewHTTPS() *gin.Engine {
 	env := config.GetDefault("general.environment", "dev").MustString()
 	switch env {
 	case "dev":
