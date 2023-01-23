@@ -50,6 +50,7 @@ func NewHTTPS() *gin.Engine {
 		apiv1Group.POST("register", apiv1.RegisterHandler)
 		apiv1Group.POST("auth", apiv1.AuthHandler)
 		apiv1Group.POST("revoke", apiv1.RevokeHandler)
+		apiv1Group.POST("refresh", apiv1.RefreshHandler)
 	}
 
 	return router

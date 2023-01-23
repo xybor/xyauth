@@ -8,7 +8,7 @@ import (
 	"github.com/xybor-x/xyerror"
 	"github.com/xybor-x/xypriv"
 	"github.com/xybor/xyauth/internal/logger"
-	"github.com/xybor/xyauth/pkg/token"
+	"github.com/xybor/xyauth/internal/token"
 )
 
 // Check returns a privilege Checker. If the access token is available, the

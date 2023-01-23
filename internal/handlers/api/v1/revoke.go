@@ -5,11 +5,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/xybor-x/xyerror"
 	"github.com/xybor/xyauth/internal/logger"
+	"github.com/xybor/xyauth/internal/token"
 	"github.com/xybor/xyauth/internal/utils"
 	"github.com/xybor/xyauth/pkg/service"
-	"github.com/xybor/xyauth/pkg/token"
 )
 
 type RevokeParams struct {
@@ -18,9 +19,9 @@ type RevokeParams struct {
 }
 
 func RevokeHandler(ctx *gin.Context) {
-	params := RevokeParams{}
+	params := new(RevokeParams)
 
-	if err := ctx.ShouldBind(&params); err != nil {
+	if err := ctx.ShouldBindBodyWith(params, binding.JSON); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "invalid parameters"})
 		return
 	}
@@ -36,7 +37,7 @@ func RevokeHandler(ctx *gin.Context) {
 		return
 	}
 
-	if err := service.RevokeRefreshToken(params.RefreshToken); err != nil {
+	if err := service.RevokeRefreshToken(refreshToken); err != nil {
 		if errors.Is(err, service.NotFoundError) {
 			ctx.JSON(http.StatusNotFound, gin.H{"message": "not found the refresh token"})
 		} else {

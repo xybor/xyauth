@@ -2,37 +2,100 @@ package service
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/xybor/xyauth/internal/database"
 	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/internal/models"
-	"github.com/xybor/xyauth/pkg/token"
+	"github.com/xybor/xyauth/internal/token"
+	"github.com/xybor/xyauth/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CheckWhitelistRefreshToken(t string) error {
-	err := database.GetMongoCollection(models.RefreshToken{}).FindOne(
-		context.Background(),
-		bson.D{{Key: "token", Value: t}},
-	).Err()
+func CreateRefreshToken(email string) (string, error) {
+	family := utils.GenerateRandomString(32)
+
+	value, err := token.Create(token.NewRefreshTokenConfig(email, family, 0))
+	if err != nil {
+		return "", err
+	}
+
+	_, err = database.GetMongoCollection(models.RefreshToken{}).InsertOne(
+		context.Background(), models.RefreshToken{
+			Email:      email,
+			Family:     family,
+			Counter:    0,
+			Expiration: time.Now().Add(token.RefreshTokenExpiration),
+		},
+	)
 
 	if err != nil {
-		if !errors.Is(err, mongo.ErrNoDocuments) {
-			logger.Event("check-whitelist-refresh-token-failed").
-				Field("error", err).Warning()
-		}
-		return NotFoundError.New("refresh token is revoked or never issued")
+		logger.Event("whitelist-refresh-token-failed").
+			Field("token", value).Field("error", err).Error()
+		return "", ServiceError.New("can not insert refresh token")
 	}
-	return nil
+
+	return value, nil
 }
 
-func RevokeRefreshToken(t string) error {
+func InheritRefreshToken(request token.RefreshToken) (string, error) {
+	result := database.GetMongoCollection(models.RefreshToken{}).FindOne(
+		context.Background(), bson.D{
+			{Key: "family", Value: request.Family},
+			{Key: "email", Value: request.Email},
+		},
+	)
+
+	if result.Err() != nil {
+		return "", NotFoundError.New("refresh token is expired or invalid")
+	}
+
+	info := models.RefreshToken{}
+	if err := result.Decode(&info); err != nil {
+		logger.Event("whitelist-refresh-token-failed").
+			Field("result", result).Field("error", err).Error()
+		return "", ValueError.New("invalid whitelist token")
+	}
+
+	if request.ID < info.Counter {
+		RevokeRefreshToken(request)
+		return "", SecurityError.New("the request token might be stolen")
+	}
+
+	updateResult, err := database.GetMongoCollection(models.RefreshToken{}).UpdateOne(
+		context.Background(), bson.D{
+			{Key: "family", Value: request.Family},
+			{Key: "email", Value: request.Email},
+			{Key: "counter", Value: info.Counter}, // Avoid race condition
+		},
+		bson.D{{Key: "$inc", Value: bson.D{{Key: "counter", Value: 1}}}},
+	)
+
+	if err != nil {
+		logger.Event("update-refresh-token-failed").
+			Field("family", info.Family).Field("error", err).Error()
+		return "", ServiceError.New("can not update refresh token")
+	}
+
+	if updateResult.MatchedCount == 0 {
+		return "", SecurityError.New("may be a race condition occurred")
+	}
+
+	value, err := token.Create(token.NewRefreshTokenConfig(info.Email, info.Family, info.Counter+1))
+	if err != nil {
+		return "", err
+	}
+
+	return value, nil
+}
+
+func RevokeRefreshToken(request token.RefreshToken) error {
 	_, err := database.GetMongoCollection(models.RefreshToken{}).DeleteOne(
 		context.Background(),
-		bson.D{{Key: "token", Value: t}},
+		bson.D{
+			{Key: "family", Value: request.Family},
+			{Key: "email", Value: request.Email},
+		},
 	)
 
 	if err != nil {

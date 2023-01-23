@@ -3,15 +3,13 @@ package v1
 import (
 	"errors"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xybor-x/xyerror"
-	"github.com/xybor/xyauth/internal/config"
 	"github.com/xybor/xyauth/internal/logger"
+	"github.com/xybor/xyauth/internal/token"
 	"github.com/xybor/xyauth/internal/utils"
 	"github.com/xybor/xyauth/pkg/service"
-	"github.com/xybor/xyauth/pkg/token"
 )
 
 type LoginParams struct {
@@ -42,8 +40,8 @@ func LoginPOSTHandler(ctx *gin.Context) {
 		case err != nil:
 			logger.Event("query-user-failed").
 				Field("email", params.Email).Field("error", err).Warning()
-			ctx.HTML(http.StatusInternalServerError, "login.html", gin.H{
-				"message": "Something is wrong, please contact to administrator if the issue persists",
+			ctx.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"message": "500 Internal Server Error - " + err.Error(),
 			})
 		}
 		return
@@ -51,33 +49,22 @@ func LoginPOSTHandler(ctx *gin.Context) {
 
 	accessToken, err := service.CreateAccessToken(params.Email)
 	if err != nil {
-		ctx.HTML(http.StatusInternalServerError, "login.html", gin.H{
-			"message": "Something is wrong, please contact to administrator if the issue persists",
+		ctx.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"message": "500 Internal Server Error - " + err.Error(),
 		})
 		return
 	}
 
 	refreshToken, err := service.CreateRefreshToken(params.Email)
 	if err != nil {
-		ctx.HTML(http.StatusInternalServerError, "login.html", gin.H{
-			"message": "Something is wrong, please contact to administrator if the issue persists",
+		ctx.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"message": "500 Internal Server Error - " + err.Error(),
 		})
 		return
 	}
 
-	ctx.SetCookie(
-		"access_token", accessToken,
-		int(token.AccessTokenExpiration/time.Second), "/",
-		config.GetDefault("server.domain", "localhost").MustString(),
-		true, true,
-	)
-
-	ctx.SetCookie(
-		"refresh_token", refreshToken,
-		int(token.RefreshTokenExpiration/time.Second), "/",
-		config.GetDefault("server.domain", "localhost").MustString(),
-		true, true,
-	)
+	utils.SetCookie(ctx, "access_token", accessToken, token.AccessTokenExpiration)
+	utils.SetCookie(ctx, "refresh_token", refreshToken, token.RefreshTokenExpiration)
 
 	uri, ok := ctx.GetQuery("redirect_uri")
 	if !ok {

@@ -1,11 +1,30 @@
 # Introduction
 
-Xyauth acts as an authentication provider which is compatible with oauth2 and openid.
+Xyauth is an authentication provider which is compatible with oauth2 and openid.
+
+# Features
+
+## Access Token and Refresh Token
+
+- Access Token is used to request to access the resource. Is has a very short expiration (about 1m). Access Token reduces the number of database queries.
+- Refresh Token is used to request a new access token. It has longer expiration (about 10m). Refresh Token reduces the number of user logins.
+
+- When a user supspects the cookie has been stolen, user can revoke the refresh token. Access token cannot be revoked.
+
+## One-time Refresh Token
+
+- Problem: After the refresh token expired, they must login again even if they are active (online) during that time. We want the user not to login if they are still active. They should login if they are inactive until the refresh token expires.
+
+- Solution: One-time refresh token. When user uses the refresh token to create a new access token, we also create a new refresh token with a new expiration.
+
+## Cookie stolen detection
+
+- When a refresh token is used to exchange the new access and refresh token, it will be revoked immediately. If that token is used to exchange again, application will revoke all refresh tokens in the chain.
 
 # Techniques
 
 - Language: Golang, HTML, CSS, Javascript.
-- Database: PostgreSQL, MongoDB. // Redis
+- Database: PostgreSQL, MongoDB.
 - Deployment: Docker, Docker Compose.
 - Cloud: AWS.
 - Others:

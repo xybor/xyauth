@@ -2,8 +2,9 @@ package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/xybor/xyauth/internal/logger"
-	"github.com/xybor/xyauth/pkg/token"
+	"github.com/xybor/xyauth/internal/token"
 )
 
 type BearerTokenParam struct {
@@ -14,7 +15,7 @@ type BearerTokenParam struct {
 // context.
 func VerifyAccessToken(ctx *gin.Context) {
 	params := BearerTokenParam{}
-	if err := ctx.ShouldBind(&params); err != nil {
+	if err := ctx.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		if params.AccessToken, err = ctx.Cookie("access_token"); err != nil {
 			return
 		}
