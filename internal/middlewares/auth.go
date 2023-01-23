@@ -1,21 +1,28 @@
 package middlewares
 
 import (
+	"strings"
+
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/internal/token"
 )
 
 type BearerTokenParam struct {
-	AccessToken string `json:"access_token" binding:"required"`
+	AccessToken string `header:"Authorization" binding:"required"`
 }
 
 // VerifyAccessToken verifies the access token in cookies, then adds it into the
 // context.
 func VerifyAccessToken(ctx *gin.Context) {
-	params := BearerTokenParam{}
-	if err := ctx.ShouldBindBodyWith(&params, binding.JSON); err != nil {
+	params := new(BearerTokenParam)
+	if err := ctx.ShouldBindHeader(params); err == nil {
+		authType, value, found := strings.Cut(params.AccessToken, " ")
+		if !found || strings.ToLower(authType) != "bearer" {
+			return
+		}
+		params.AccessToken = value
+	} else {
 		if params.AccessToken, err = ctx.Cookie("access_token"); err != nil {
 			return
 		}
