@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 	"github.com/xybor-x/xyerror"
 	"github.com/xybor/xyauth/pkg/service"
 )
@@ -17,7 +16,7 @@ type AuthParams struct {
 
 func AuthHandler(ctx *gin.Context) {
 	params := new(AuthParams)
-	if err := ctx.ShouldBindBodyWith(params, binding.JSON); err != nil {
+	if err := ctx.ShouldBind(params); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "invalid parameters"})
 		return
 	}

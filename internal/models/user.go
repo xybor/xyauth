@@ -18,6 +18,12 @@ type User struct {
 
 // Relation implements xypriv.Subject interface.
 func (u User) Relation(ctx any, s xypriv.Subject) xypriv.Relation {
+	if another, ok := s.(User); ok {
+		if u.Email == another.Email {
+			return "self"
+		}
+	}
+
 	switch u.Role {
 	case "admin":
 		return "admin"
@@ -27,12 +33,6 @@ func (u User) Relation(ctx any, s xypriv.Subject) xypriv.Relation {
 
 	switch ctx {
 	case nil:
-		switch t := s.(type) {
-		case User:
-			if t.Email == u.Email {
-				return "self"
-			}
-		}
 		return "member"
 	}
 

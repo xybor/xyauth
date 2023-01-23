@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 	"github.com/xybor-x/xyerror"
 	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/internal/token"
@@ -14,14 +13,12 @@ import (
 )
 
 type RevokeParams struct {
-	AccessToken  string `json:"access_token" binding:"required"`
 	RefreshToken string `json:"refresh_token" binding:"required"`
 }
 
 func RevokeHandler(ctx *gin.Context) {
 	params := new(RevokeParams)
-
-	if err := ctx.ShouldBindBodyWith(params, binding.JSON); err != nil {
+	if err := ctx.ShouldBind(params); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "invalid parameters"})
 		return
 	}
