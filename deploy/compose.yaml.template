@@ -71,7 +71,8 @@ services:
     command: -c configs/compose.ini
     restart: always
     ports:
-      - {{ .server.host }}:{{ .server.port }}:8443
+      - {{ .server.host }}:{{ .server.port }}:8080
+      - {{ .server.host }}:{{ .server.tls_port }}:8443
     environment:
       - POSTGRES_DB=${POSTGRES_DB:-{{ .default.postgres_db }}}
       - POSTGRES_USER=${POSTGRES_USER:-{{ .default.postgres_user }}}

@@ -21,6 +21,7 @@ COPY --from=build /server /database /
 COPY --from=build /xyauth/configs /configs
 COPY --from=build /xyauth/web /web
 
+EXPOSE 8080
 EXPOSE 8443
 
 ENTRYPOINT [ "/server" ]

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 	"github.com/xybor-x/xycond"
 	"github.com/xybor/xyauth/internal/config"
@@ -35,11 +37,20 @@ var rootCmd = &cobra.Command{
 				logger.Event("register-init-admin-failed").Field("error", err).Warning()
 			}
 		}
+		host := config.GetDefault("server.host", "0.0.0.0").MustString()
+		port := config.GetDefault("server.port", 8080).MustInt()
+		tlsPort := config.GetDefault("server.tls_port", 8443).MustInt()
 
-		server, listener := server.NewServer()
+		addr := fmt.Sprintf("%s:%d", host, port)
+		tlsAddr := fmt.Sprintf("%s:%d", host, tlsPort)
 
-		logger.Event("server-start").Field("address", server.Addr).Info()
-		logger.Event("server-close").Field("error", server.Serve(listener)).Info()
+		go func() {
+			logger.Event("server-start").Field("address", addr).Info()
+			logger.Event("server-close").Field("error", server.NewHTTP()()).Info()
+		}()
+
+		logger.Event("server-start").Field("address", tlsAddr).Info()
+		logger.Event("server-close").Field("error", server.NewHTTPS()()).Info()
 	},
 }
 
