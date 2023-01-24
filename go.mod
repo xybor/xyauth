@@ -12,7 +12,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/unrolled/secure v1.13.0
 	github.com/xybor-x/xycond v1.0.0
-	github.com/xybor-x/xyconfig v1.3.2
+	github.com/xybor-x/xyconfig v1.4.1
 	github.com/xybor-x/xyerror v1.0.5
 	github.com/xybor-x/xylog v0.5.0
 	github.com/xybor-x/xypriv v0.0.0-20230117160404-66f32c9cd7f7
@@ -23,6 +23,7 @@ require (
 )
 
 require (
+	github.com/aws/aws-sdk-go v1.44.180 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
@@ -37,6 +38,7 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect

@@ -1,8 +1,9 @@
 package config
 
 import (
-	"log"
+	"time"
 
+	"github.com/xybor-x/xycond"
 	"github.com/xybor-x/xyconfig"
 )
 
@@ -11,24 +12,29 @@ var config *xyconfig.Config
 func init() {
 	config = xyconfig.GetConfig("xyauth")
 
-	if err := config.ReadFile("configs/default.ini", true); err != nil {
-		log.Panic(err)
+	xycond.AssertNil(config.ReadFile("configs/default.ini", true))
+
+	d := config.GetDefault("general.config_watch", time.Minute).MustDuration()
+	config.SetWatchInterval(d)
+
+	if files, ok := config.Get("general.additions"); ok {
+		for _, f := range files.MustArray() {
+			if val, ok := f.AsString(); ok && val != "" {
+				xycond.AssertNil(config.Read(val))
+			}
+		}
 	}
 
-	d := config.GetDefault("general.env_watch_cycle", 0).MustDuration()
-	if err := config.LoadEnv(d); err != nil {
-		log.Panic(err)
-	}
+	// Load environment variables.
+	xycond.AssertNil(config.Read("env"))
 
 	if config.GetDefault("general.environment", "dev").MustString() == "dev" {
-		if err := config.ReadFile(".env", true); err != nil {
-			log.Panic(err)
-		}
+		xycond.AssertNil(config.Read(".env"))
 	}
 }
 
 func Add(f string) error {
-	return config.ReadFile(f, true)
+	return config.Read(f)
 }
 
 func Get(name string) (xyconfig.Value, bool) {

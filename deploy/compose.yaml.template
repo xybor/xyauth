@@ -82,6 +82,9 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-{{ .default.mongo_initdb_root_password }}}
       - XYBOR_INIT_ADMIN_EMAIL=${XYBOR_INIT_ADMIN_EMAIL:-{{ .default.xybor_init_admin_email }}}
       - XYBOR_INIT_ADMIN_PASSWORD=${XYBOR_INIT_ADMIN_PASSWORD:-{{ .default.xybor_init_admin_password }}}
+      - AWS_REGION
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
       - SERVER_PRIVATE_KEY
       - SERVER_PUBLIC_KEY
       - OAUTH_PRIVATE_KEY
