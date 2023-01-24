@@ -12,7 +12,7 @@ var config *xyconfig.Config
 func init() {
 	config = xyconfig.GetConfig("xyauth")
 
-	xycond.AssertNil(config.ReadFile("configs/default.ini", true))
+	xycond.AssertNil(config.ReadFile("configs/10-default.ini", true))
 
 	d := config.GetDefault("general.config_watch", time.Minute).MustDuration()
 	config.SetWatchInterval(d)

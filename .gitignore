@@ -29,6 +29,7 @@ template
 *.crt
 !/unittest/*.key
 !/unittest/*.crt
+*.pem
 
 # Environment variables
 .env

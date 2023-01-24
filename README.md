@@ -26,7 +26,7 @@ Xyauth is an authentication provider which is compatible with oauth2 and openid.
 - Language: Golang, HTML, CSS, Javascript.
 - Database: PostgreSQL, MongoDB.
 - Deployment: Docker, Docker Compose.
-- Cloud: AWS.
+- Cloud: AWS (EC2, S3, RDS, DocumentDB).
 - Others:
 
   - xypriv: privilege management library.

@@ -29,7 +29,7 @@ run: server
 	$(SERVER)
 
 docker-gen: template
-	$(TEMPLATE) $(DOCKER_COMPOSE_FILE).template -c configs/compose.ini
+	$(TEMPLATE) $(DOCKER_COMPOSE_FILE).template -c configs/20-compose.ini
 
 docker-build:
 	$(DOCKER) build -t $(IMAGE_NAME) -f $(DOCKERFILE) .
