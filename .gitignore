@@ -36,3 +36,4 @@ template
 # Generated files
 deploy/compose.yaml
 test/test_*/configs
+test/configs
