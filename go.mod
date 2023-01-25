@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/agiledragon/gomonkey/v2 v2.9.0
+	github.com/aws/aws-sdk-go v1.44.180
 	github.com/gin-gonic/gin v1.8.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jackc/pgx/v5 v5.2.0
@@ -12,7 +13,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/unrolled/secure v1.13.0
 	github.com/xybor-x/xycond v1.0.0
-	github.com/xybor-x/xyconfig v1.4.1
+	github.com/xybor-x/xyconfig v1.5.0
 	github.com/xybor-x/xyerror v1.0.5
 	github.com/xybor-x/xylog v0.5.0
 	github.com/xybor-x/xypriv v0.0.0-20230117160404-66f32c9cd7f7
@@ -23,7 +24,6 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.44.180 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect

@@ -127,8 +127,8 @@ github.com/xdg-go/stringprep v1.0.3 h1:kdwGpVNwPFtjs98xCGkHjQtGKh86rDcRZN17QEMCO
 github.com/xdg-go/stringprep v1.0.3/go.mod h1:W3f5j4i+9rC0kuIEJL0ky1VpHXQU3ocBgklLGvcBnW8=
 github.com/xybor-x/xycond v1.0.0 h1:RJippg8hc0/HcEerJQrddHok7iaZUyLGrjN6Pbpe8u8=
 github.com/xybor-x/xycond v1.0.0/go.mod h1:b/NXVIxFPWvGyHAAdkNooYSw9IpqF04VuW2+i7iE8sU=
-github.com/xybor-x/xyconfig v1.4.1 h1:bLO8exeLPXQ4ACPvcD2BrD7z627G6rKWrAhyv/MFu90=
-github.com/xybor-x/xyconfig v1.4.1/go.mod h1:yyWvaWx0zYMjkgXwOKeWQF8NTpZVUcWWLz+Vy8jQFZo=
+github.com/xybor-x/xyconfig v1.5.0 h1:xfe8QAaG1vAboR7t9d928f1VgOaH7Qa7cs90fi5xbzg=
+github.com/xybor-x/xyconfig v1.5.0/go.mod h1:yyWvaWx0zYMjkgXwOKeWQF8NTpZVUcWWLz+Vy8jQFZo=
 github.com/xybor-x/xyerror v1.0.5 h1:SiC0OWcVDvb3MwLMTFWCvnrACYln3KbYkhr9nehtfV0=
 github.com/xybor-x/xyerror v1.0.5/go.mod h1:2P0SjxOPAkdllEpPhmlWYVOGKDVxzwl/RkmLcc2i9Os=
 github.com/xybor-x/xylock v0.0.1 h1:/LhbJb6WJkUW+xE4/bBpIC76BKrbgnayiId6LdouqUw=

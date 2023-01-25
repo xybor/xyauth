@@ -1,14 +1,14 @@
 version: '3'
-services:
+services:{{ if eq .postgresql.deployment "compose" }}
   postgresql:
     container_name: {{ .postgresql.host }}
     image: postgres:12
     command: -p {{ .postgresql.port }}
     restart: always
     environment:
+      - POSTGRES_DB=${POSTGRES_DB:-{{ .default.postgres_db }}}
       - POSTGRES_USER=${POSTGRES_USER:-{{ .default.postgres_user }}}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-{{ .default.postgres_password }}}
-      - POSTGRES_DB=${POSTGRES_DB:-{{ .default.postgres_db }}}
     volumes:
       - postgresql:/var/lib/postgresql/data
     expose:
@@ -16,7 +16,7 @@ services:
     networks:
       - MAIN
       - PG_ADMIN
-
+{{ end }}
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
@@ -28,10 +28,10 @@ services:
     volumes:
        - pgadmin:/var/lib/pgadmin
     ports:
-      - 127.0.0.1:{{ .default.pgadmin_port }}:80
+      - {{ .server.host }}:{{ .default.pgadmin_port }}:80
     networks:
       - PG_ADMIN
-
+{{ if eq .mongodb.deployment "compose" }}
   mongodb:
     container_name: {{ .mongodb.host }}
     image: mongo:6.0
@@ -49,26 +49,25 @@ services:
     networks:
       - MONGO_EXPRESS
       - MAIN
-
+{{ end }}
   mongo-express:
     image: mongo-express
+    container_name: mongo-express
     restart: always
     ports:
-      - 127.0.0.1:{{ .default.mongo_express_port }}:8081
+      - {{ .server.host }}:{{ .default.mongo_express_port }}:8081
     environment:
       - ME_CONFIG_MONGODB_SERVER={{ .mongodb.host }}
       - ME_CONFIG_MONGODB_PORT={{ .mongodb.port }}
       - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME:-{{ .default.mongo_initdb_root_username }}}
       - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD:-{{ .default.mongo_initdb_root_password }}}
-    depends_on:
-      - mongodb
     networks:
       - MONGO_EXPRESS
 
   xyauth:
     container_name: xyauth
     image: xyauth:latest
-    command: -c configs/compose.ini
+    command: -c configs/20-compose.ini
     restart: always
     ports:
       - {{ .server.host }}:{{ .server.port }}:8080
@@ -89,8 +88,6 @@ services:
       - SERVER_PUBLIC_KEY
       - OAUTH_PRIVATE_KEY
       - OAUTH_PUBLIC_KEY
-    depends_on:
-      - postgresql
     networks:
       - MAIN
 
