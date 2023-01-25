@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/layout/site.css" />
+    <link rel="stylesheet" href="/static/profile/css/profile.css" />
+    <script src="https://kit.fontawesome.com/35394f46a8.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header class="fixed-top">
+        <nav class="navbar bg-light navbar-expand-sm navbar-toggleable-sm navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <img src="/static/img/logo_black.png" width="99" height="54" alt="logo"/>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu-bar, #sidebarMenu" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div id="menu-bar" class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
+                    <ul class="navbar-nav">
+                        <li class="nav-item mx-4">
+                            <a class="nav-link text-dark" href="/" title="Home">Home</a>
+                        </li>
+                        <li class="nav-item mx-4">
+                            <a class="nav-link text-dark" href="/profile" title="User">User</a>
+                        </li>
+                        <li class="nav-item mx-4">
+                            <a class="nav-link text-dark" href="/register" title="Create Account">Create Account</a>
+                        </li>
+                        <li class="nav-item mx-4">
+                            <a class="nav-link btn btn-md btn-primary rounded-0 text-white px-4" href="logout?redirect_uri=/" title="Logout">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main role="main" class="d-flex flex-column flex-nowrap position-relative">
+        <div class="container-fluid">
+            <div class="row flex-nowrap">
+                <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block collapse text-dark min-vh-100">
+                    <div class="position-sticky pt-3">
+                      <ul class="nav flex-column">
+                        <li class="nav-item">
+                          <a class="nav-link text-dark" aria-current="page" href="#">
+                            <i class="fa-regular fa-user me-3"></i>
+                            User
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link text-dark" href="#">
+                            <i class="fa-regular fa-clock me-3"></i>
+                            Sessions
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                </nav>
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-8">
+                                <h1 class="text-center fw-bold fs-1">User</h2>
+                                    <form method="post">
+                                        <h4>User Information</h4>
+                                        <div class="form-group row my-3">
+                                            <div class="col">
+                                                <label for="firstName" class="form-label">First Name</label>
+                                                <input id="firstName" class="form-control font-weight-light" placeholder="First Name" autocomplete="off" />
+                                                <span class="text-danger font-weight-light"></span>
+                                            </div>
+                                            <div class="col">
+                                                <label for="lastName" class="form-label">Last Name</label>
+                                                <input id="lastName" class="form-control font-weight-light" placeholder="Last Name" autocomplete="off" />
+                                                <span class="text-danger font-weight-light"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group my-3">
+                                            <label for="email" class="form-label">Email</label>
+                                            <input type="email" id="UserEmail" class="form-control font-weight-light" placeholder="Email" autocomplete="off" />
+                                            <span class="text-danger font-weight-light"></span>
+                                        </div>
+                                        <div class="form-group my-3">
+                                            <label for="userPhone" class="form-label">Phone Number</label>
+                                            <input type="number" id="userPhone" class="form-control font-weight-light" placeholder="Phone Number" autocomplete="off" />
+                                            <span class="text-danger font-weight-light"></span>
+                                        </div>
+                                        <div class="form-group my-3">
+                                            <label for="address" class="form-label">Address</label>
+                                            <input id="address" class="form-control font-weight-light" placeholder="Address" autocomplete="off" />
+                                            <span class="text-danger font-weight-light"></span>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-lg btn-outline-primary text-white w-100">Submit</button>
+                                    </form>  
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                        </div>
+                          
+                    </div>
+                    
+                </main>
+            </div>
+        </div>
+    </main>
+    <footer class="d-flex align-items-center footer text-white bg-primary">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-sm-12 col-sm-12 text-center text-md-start">
+                    <small>
+                        <span>
+                            &copy;
+                            <script>
+                                var CurrentYear = new Date().getFullYear();
+                                document.write(CurrentYear);
+                            </script>
+                            - Xybor. All Rights Reserved.
+                        </span>
+                    </small>
+                    <br />
+                    <small>
+                        <div>Follow us on:</div>
+                        <a target="_blank" class="text-white" href="https://github.com/xybor" title="github" rel="noopener"><i class="fab fa-github fa-2x"></i></a>
+                    </small>
+                </div>
+                <div class="col-md-6 col-sm-12 col-sm-12 text-center text-md-end">
+                    <small>
+                        <a target="_blank"
+                           class="text-white text-decoration-none"
+                           href="#">Privacy Policy</a>
+                        |
+                        <a target="_blank" class="text-white text-decoration-none" href="#">Terms & Conditions</a>
+                    </small>
+                    <br />
+                    <img src="/static/img/logo_white.png" width="99" height="54" alt="logo"/>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="../static/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
