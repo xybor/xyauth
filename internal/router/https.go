@@ -26,12 +26,14 @@ func NewHTTPS() *gin.Engine {
 		logger.Event("invalid-environment").Field("env", env).Panic()
 	}
 
-	router := gin.Default()
+	router := gin.New()
 
 	router.Static("/static", "web/static")
 	router.StaticFile("/favicon.ico", "web/static/favicon.ico")
 	router.LoadHTMLGlob("web/template/*.html")
 
+	router.Use(middlewares.Logger)
+	router.Use(middlewares.Recovery)
 	router.Use(middlewares.VerifyAccessToken)
 
 	router.GET(".well-known/openid-configuration", openid.Handler)

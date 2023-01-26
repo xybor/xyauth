@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/unrolled/secure"
 	"github.com/xybor/xyauth/internal/config"
+	"github.com/xybor/xyauth/internal/middlewares"
 )
 
 // NewHTTP returns a new router for HTTP. It redirects all requests to HTTPS
@@ -26,7 +27,9 @@ func NewHTTP() *gin.Engine {
 		}
 	}()
 
-	router := gin.Default()
+	router := gin.New()
+	router.Use(middlewares.Logger)
+	router.Use(middlewares.Recovery)
 	router.Use(secureFunc)
 
 	return router
