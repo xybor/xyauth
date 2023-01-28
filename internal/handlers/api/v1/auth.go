@@ -21,7 +21,7 @@ func AuthHandler(ctx *gin.Context) {
 		return
 	}
 
-	err := service.Authenticate(params.Email, params.Password)
+	id, err := service.Authenticate(params.Email, params.Password)
 	if err != nil {
 		switch {
 		case errors.Is(err, service.NotFoundError):
@@ -34,13 +34,13 @@ func AuthHandler(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := service.CreateAccessToken(params.Email)
+	accessToken, err := service.CreateAccessToken(id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": xyerror.Message(err)})
 		return
 	}
 
-	refreshToken, err := service.CreateRefreshToken(params.Email)
+	refreshToken, err := service.CreateRefreshToken(id)
 	if err != nil {
 		ctx.Status(http.StatusInternalServerError)
 		return

@@ -27,7 +27,7 @@ func RefreshHandler(ctx *gin.Context) {
 		if errors.Is(err, token.TokenError) {
 			ctx.JSON(http.StatusForbidden, gin.H{"message": xyerror.Message(err)})
 		} else {
-			logger.Event("refresh-token-invalid").
+			logger.Event("refresh-token-invalid", ctx).
 				Field("token", params.RefreshToken).Field("error", err).Warning()
 			ctx.Status(http.StatusInternalServerError)
 		}
@@ -40,7 +40,7 @@ func RefreshHandler(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := service.CreateAccessToken(refreshToken.Email)
+	accessToken, err := service.CreateAccessToken(refreshToken.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": xyerror.Message(err)})
 		return

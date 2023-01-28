@@ -4,12 +4,13 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/xybor-x/xypriv"
 	"github.com/xybor/xyauth/internal/models"
+	"gorm.io/gorm"
 )
 
 type RefreshToken struct {
-	Email  string
-	Family string
-	ID     int // The id of token in its family
+	ID       uint
+	Family   string
+	FamilyID uint // The family id of token
 }
 
 func (t *RefreshToken) Unmarshal(payload any) error {
@@ -24,7 +25,7 @@ func (t RefreshToken) Context() any {
 }
 
 func (t RefreshToken) Owner() xypriv.Subject {
-	return models.User{Email: t.Email}
+	return models.User{Model: gorm.Model{ID: t.ID}}
 }
 
 func (t RefreshToken) Permission(action ...string) xypriv.AccessLevel {

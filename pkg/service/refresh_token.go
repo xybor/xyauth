@@ -12,17 +12,19 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func CreateRefreshToken(email string) (string, error) {
+func CreateRefreshToken(id uint) (string, error) {
 	family := utils.GenerateRandomString(32)
 
-	value, err := token.Create(token.NewRefreshTokenConfig(email, family, 0))
+	value, err := token.Create(token.NewRefreshTokenConfig(token.RefreshToken{
+		ID: id, Family: family, FamilyID: 0,
+	}))
 	if err != nil {
 		return "", err
 	}
 
 	_, err = database.GetMongoCollection(models.RefreshToken{}).InsertOne(
 		context.Background(), models.RefreshToken{
-			Email:      email,
+			ID:         id,
 			Family:     family,
 			Counter:    0,
 			Expiration: time.Now().Add(token.RefreshTokenExpiration),
@@ -42,7 +44,7 @@ func InheritRefreshToken(request token.RefreshToken) (string, error) {
 	result := database.GetMongoCollection(models.RefreshToken{}).FindOne(
 		context.Background(), bson.D{
 			{Key: "family", Value: request.Family},
-			{Key: "email", Value: request.Email},
+			{Key: "id", Value: request.ID},
 		},
 	)
 
@@ -57,7 +59,7 @@ func InheritRefreshToken(request token.RefreshToken) (string, error) {
 		return "", ValueError.New("invalid whitelist token")
 	}
 
-	if request.ID < info.Counter {
+	if request.FamilyID < info.Counter {
 		RevokeRefreshToken(request)
 		return "", SecurityError.New("the request token might be stolen")
 	}
@@ -65,7 +67,7 @@ func InheritRefreshToken(request token.RefreshToken) (string, error) {
 	updateResult, err := database.GetMongoCollection(models.RefreshToken{}).UpdateOne(
 		context.Background(), bson.D{
 			{Key: "family", Value: request.Family},
-			{Key: "email", Value: request.Email},
+			{Key: "id", Value: request.ID},
 			{Key: "counter", Value: info.Counter}, // Avoid race condition
 		},
 		bson.D{{Key: "$inc", Value: bson.D{{Key: "counter", Value: 1}}}},
@@ -81,7 +83,11 @@ func InheritRefreshToken(request token.RefreshToken) (string, error) {
 		return "", SecurityError.New("may be a race condition occurred")
 	}
 
-	value, err := token.Create(token.NewRefreshTokenConfig(info.Email, info.Family, info.Counter+1))
+	value, err := token.Create(token.NewRefreshTokenConfig(token.RefreshToken{
+		ID:       info.ID,
+		Family:   info.Family,
+		FamilyID: info.Counter + 1,
+	}))
 	if err != nil {
 		return "", err
 	}
@@ -94,7 +100,7 @@ func RevokeRefreshToken(request token.RefreshToken) error {
 		context.Background(),
 		bson.D{
 			{Key: "family", Value: request.Family},
-			{Key: "email", Value: request.Email},
+			{Key: "id", Value: request.ID},
 		},
 	)
 

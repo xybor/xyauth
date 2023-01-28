@@ -2,8 +2,6 @@ package token
 
 import (
 	"time"
-
-	"github.com/xybor/xyauth/internal/models"
 )
 
 type Config struct {
@@ -11,16 +9,16 @@ type Config struct {
 	expiration time.Duration
 }
 
-func NewAccessTokenConfig(u models.User) Config {
+func NewAccessTokenConfig(a AccessToken) Config {
 	return Config{
-		payload:    AccessToken{User: u},
+		payload:    a,
 		expiration: AccessTokenExpiration,
 	}
 }
 
-func NewRefreshTokenConfig(email, family string, familyID int) Config {
+func NewRefreshTokenConfig(r RefreshToken) Config {
 	return Config{
-		payload:    RefreshToken{Email: email, Family: family, ID: familyID},
+		payload:    r,
 		expiration: RefreshTokenExpiration,
 	}
 }

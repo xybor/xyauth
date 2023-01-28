@@ -3,6 +3,7 @@ package logger
 import (
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/xybor-x/xyconfig"
 	"github.com/xybor-x/xylog"
 	"github.com/xybor/xyauth/internal/config"
@@ -11,8 +12,15 @@ import (
 var logger *xylog.Logger
 
 // Event creates an EventLogger which logs key-value pairs.
-func Event(e string) *xylog.EventLogger {
-	return logger.Event(e)
+func Event(e string, ctx ...*gin.Context) *xylog.EventLogger {
+	elg := logger.Event(e)
+	if len(ctx) == 1 {
+		if id, ok := ctx[0].Get("requestID"); ok {
+			elg.Field("request_id", id)
+		}
+	}
+
+	return elg
 }
 
 func init() {

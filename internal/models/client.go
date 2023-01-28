@@ -6,7 +6,7 @@ import (
 
 // Client represents for an OAuth client.
 type Client struct {
-	gorm.Model `json:"-"`
-	UserID     string
-	Secret     string
+	gorm.Model
+	UserID string
+	Secret string
 }

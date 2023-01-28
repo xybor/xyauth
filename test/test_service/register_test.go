@@ -14,11 +14,11 @@ func TestRegister(t *testing.T) {
 	closer := test.StartMock(t, test.MockRegister{})
 	defer closer()
 
-	xycond.ExpectNil(service.Register("foo@bar.com", "123456", "user")).Test(t)
+	xycond.ExpectNil(service.Register("foo@bar.com", "123456", "member")).Test(t)
 }
 
 func TestRegisterEmptyRole(t *testing.T) {
-	closer := test.StartMock(t, test.MockRegister{ExpectedRole: "user"})
+	closer := test.StartMock(t, test.MockRegister{ExpectedRole: "member"})
 	defer closer()
 
 	xycond.ExpectNil(service.Register("foo@bar.com", "123456", "")).Test(t)
@@ -44,7 +44,7 @@ func TestRegisterDuplicated(t *testing.T) {
 }
 
 func TestRegisterUnknownError(t *testing.T) {
-	closer := test.StartMock(t, test.MockRegister{ExpectedError: errors.New("")})
+	closer := test.StartMock(t, test.MockRegister{ExpectedError: errors.New("err")})
 	defer closer()
 
 	xycond.ExpectError(service.Register("foo@bar.com", "123456", ""), service.ServiceError).Test(t)

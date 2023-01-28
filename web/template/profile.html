@@ -27,13 +27,13 @@
                             <a class="nav-link text-dark" href="/" title="Home">Home</a>
                         </li>
                         <li class="nav-item mx-4">
-                            <a class="nav-link text-dark" href="/profile" title="User">User</a>
+                            <a class="nav-link text-dark" href="/profile" title="Profile"> Profile </a>
                         </li>
                         <li class="nav-item mx-4">
-                            <a class="nav-link text-dark" href="/register" title="Create Account">Create Account</a>
+                            <a class="nav-link text-dark" href="/register" title="Register"> Register </a>
                         </li>
                         <li class="nav-item mx-4">
-                            <a class="nav-link btn btn-md btn-primary rounded-0 text-white px-4" href="logout?redirect_uri=/" title="Logout">Logout</a>
+                            <a class="nav-link btn btn-md btn-primary rounded-0 text-white px-4" href="/logout?redirect_uri=/" title="Logout">Logout</a>
                         </li>
                     </ul>
                 </div>
@@ -67,45 +67,55 @@
                             <div class="col-md-2">
                             </div>
                             <div class="col-md-8">
-                                <h1 class="text-center fw-bold fs-1">User</h2>
-                                    <form method="post">
-                                        <h4>User Information</h4>
+                                <h1 class="text-center fw-bold fs-1"> User </h2>
+                                    <form method="POST">
+                                        <h4> User Information </h4>
                                         <div class="form-group row my-3">
                                             <div class="col">
                                                 <label for="firstName" class="form-label">First Name</label>
-                                                <input id="firstName" class="form-control font-weight-light" placeholder="First Name" autocomplete="off" />
+                                                <input id="firstName" name="first_name" class="form-control font-weight-light" placeholder="{{ .first_name}}" autocomplete="off" />
                                                 <span class="text-danger font-weight-light"></span>
                                             </div>
                                             <div class="col">
                                                 <label for="lastName" class="form-label">Last Name</label>
-                                                <input id="lastName" class="form-control font-weight-light" placeholder="Last Name" autocomplete="off" />
+                                                <input id="lastName" name="last_name" class="form-control font-weight-light" placeholder="{{ .last_name}}" autocomplete="off" />
+                                                <span class="text-danger font-weight-light"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row my-3">
+                                            <div class="col">
+                                                <label for="email" class="form-label"> Email </label>
+                                                <input type="email" id="UserEmail" name="email" class="form-control font-weight-light" placeholder="{{ .email}}" autocomplete="off" />
+                                                <span class="text-danger font-weight-light"></span>
+                                            </div>
+                                            <div class="col">
+                                                <label for="username" class="form-label"> Username </label>
+                                                <input id="username" name="username" class="form-control font-weight-light" placeholder="{{ .username}}" autocomplete="off" />
+                                                <span class="text-danger font-weight-light"></span>
+                                            </div>
+                                            <div class="col">
+                                                <label for="role" class="form-label"> Role </label>
+                                                <input id="role" name="role" class="form-control font-weight-light" placeholder="{{ .role}}" autocomplete="off" />
                                                 <span class="text-danger font-weight-light"></span>
                                             </div>
                                         </div>
                                         <div class="form-group my-3">
-                                            <label for="email" class="form-label">Email</label>
-                                            <input type="email" id="UserEmail" class="form-control font-weight-light" placeholder="Email" autocomplete="off" />
+                                            <label for="userPhone" class="form-label"> Phone Number </label>
+                                            <input id="userPhone" name="phone_number" class="form-control font-weight-light" placeholder="{{ .phone_number}}" autocomplete="off" />
                                             <span class="text-danger font-weight-light"></span>
                                         </div>
                                         <div class="form-group my-3">
-                                            <label for="userPhone" class="form-label">Phone Number</label>
-                                            <input type="number" id="userPhone" class="form-control font-weight-light" placeholder="Phone Number" autocomplete="off" />
+                                            <label for="address" class="form-label"> Address </label>
+                                            <input id="address" name="address" class="form-control font-weight-light" placeholder="{{ .address}}" autocomplete="off" />
                                             <span class="text-danger font-weight-light"></span>
                                         </div>
-                                        <div class="form-group my-3">
-                                            <label for="address" class="form-label">Address</label>
-                                            <input id="address" class="form-control font-weight-light" placeholder="Address" autocomplete="off" />
-                                            <span class="text-danger font-weight-light"></span>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary btn-lg btn-outline-primary text-white w-100">Submit</button>
-                                    </form>  
+                                        <button type="submit" class="btn btn-primary btn-lg btn-outline-primary text-white w-100"> Update </button>
+                                    </form>
                             </div>
                             <div class="col-md-2">
                             </div>
                         </div>
-                          
                     </div>
-                    
                 </main>
             </div>
         </div>

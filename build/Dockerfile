@@ -2,6 +2,8 @@ FROM golang:1.18-alpine AS build
 
 WORKDIR /xyauth
 
+RUN apk add -U --no-cache ca-certificates
+
 COPY go.mod .
 COPY go.sum .
 
@@ -9,8 +11,7 @@ RUN go mod download
 
 COPY . ./
 
-RUN apk add -U --no-cache ca-certificates \
- && CGO_ENABLED=0 go build -ldflags="-w -s" -o /server ./cmd/server/*.go
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o /server ./cmd/server/*.go
 
 FROM scratch
 
