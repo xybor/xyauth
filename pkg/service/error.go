@@ -10,6 +10,7 @@ var (
 	EncryptionError = ServiceError.NewException("EncryptionError")
 	NotFoundError   = ServiceError.NewException("NotFoundError")
 	SecurityError   = ServiceError.NewException("SecurityError")
+	PermissionError = ServiceError.NewException("PermissionError")
 
 	ValueError  = ServiceError.NewException("ValueError")
 	FormatError = ValueError.NewException("FormatError")

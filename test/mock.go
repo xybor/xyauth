@@ -52,29 +52,34 @@ func StartMock(t *testing.T, m ...Mocker) func() {
 }
 
 type MockRegister struct {
-	ExpectedEmail string
-	ExpectedName  string
-	ExpectedRole  string
-	ExpectedError error
+	ExpectedEmail    string
+	ExpectedUsername string
+	ExpectedRole     string
+	ExpectedError    error
 }
 
 func (m MockRegister) Mock(mock sqlmock.Sqlmock, patches *gomonkey.Patches) {
-	mock.ExpectBegin()
-	mock.ExpectExec(`INSERT INTO "user_credentials"`).
-		WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectQuery(`SELECT 1 FROM "users"`).WillReturnRows(sqlmock.NewRows([]string{"id"}))
 
+	mock.ExpectBegin()
+
+	// CreatedAt, UpdatedAt, DeletedAt.
 	expectedArgs := []driver.Value{Any, Any, Any}
+
 	if m.ExpectedEmail != "" {
 		expectedArgs = append(expectedArgs, m.ExpectedEmail)
 	} else {
 		expectedArgs = append(expectedArgs, Any)
 	}
 
-	if m.ExpectedName != "" {
-		expectedArgs = append(expectedArgs, m.ExpectedName)
+	if m.ExpectedUsername != "" {
+		expectedArgs = append(expectedArgs, m.ExpectedUsername)
 	} else {
 		expectedArgs = append(expectedArgs, Any)
 	}
+
+	// FirstName, LastName, PhoneNumber, Address
+	expectedArgs = append(expectedArgs, Any, Any, Any, Any)
 
 	if m.ExpectedRole != "" {
 		expectedArgs = append(expectedArgs, m.ExpectedRole)
@@ -85,9 +90,15 @@ func (m MockRegister) Mock(mock sqlmock.Sqlmock, patches *gomonkey.Patches) {
 	userQuery := mock.ExpectQuery(`INSERT INTO "users"`).WithArgs(expectedArgs...)
 	if m.ExpectedError != nil {
 		userQuery.WillReturnError(m.ExpectedError)
-		mock.ExpectRollback()
 	} else {
 		userQuery.WillReturnRows(&sqlmock.Rows{})
+	}
+
+	if m.ExpectedError != nil {
+		mock.ExpectRollback()
+	} else {
+		mock.ExpectExec(`INSERT INTO "user_credentials"`).
+			WillReturnResult(sqlmock.NewResult(1, 1))
 		mock.ExpectCommit()
 	}
 }
@@ -99,7 +110,7 @@ type MockAuthenticate struct {
 }
 
 func (m MockAuthenticate) Mock(mock sqlmock.Sqlmock, patches *gomonkey.Patches) {
-	query := mock.ExpectQuery(`SELECT "password" FROM "user_credentials"`)
+	query := mock.ExpectQuery(`SELECT users.id,user_credentials.password FROM "user_credentials"`)
 
 	if m.ExpectedEmail != "" {
 		query.WithArgs(m.ExpectedEmail)

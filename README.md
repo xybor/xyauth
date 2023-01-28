@@ -2,6 +2,8 @@
 
 Xyauth is an authentication provider which is compatible with oauth2 and openid.
 
+The website is hosted at [xybor space](https://xybor.space).
+
 # Features
 
 ## Access Token and Refresh Token
@@ -20,6 +22,18 @@ Xyauth is an authentication provider which is compatible with oauth2 and openid.
 ## Cookie stolen detection
 
 - When a refresh token is used to exchange the new access and refresh token, it will be revoked immediately. If that token is used to exchange again, application will revoke all refresh tokens in the chain.
+
+## User management
+
+- Allow managing user information.
+
+## Privilege management
+
+- Only admin creates admin or moderator account.
+- Only moderator creates moderator account.
+- Member can visit other user profiles with limited privileges.
+- Admin can see all user information.
+- etc. 
 
 # Techniques
 

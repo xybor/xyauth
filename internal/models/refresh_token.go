@@ -4,8 +4,8 @@ import "time"
 
 // RefreshToken represents for a refresh token stored in nosql database.
 type RefreshToken struct {
-	Email      string
+	ID         uint
 	Family     string
-	Counter    int
+	Counter    uint
 	Expiration time.Time
 }

@@ -2,41 +2,49 @@ package service
 
 import (
 	"errors"
-	"net/mail"
+	"strconv"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/xybor/xyauth/internal/database"
 	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/internal/models"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/xybor/xyauth/internal/utils"
+	"gorm.io/gorm"
 )
 
 func Register(email, password, role string) error {
 	if role == "" {
-		role = "user"
+		role = "member"
 	}
 
-	if err := checkRole(role); err != nil {
-		return err
+	if err := utils.CheckRole(role); err != nil {
+		return FormatError.New(err)
 	}
 
-	if err := checkEmail(email); err != nil {
-		return err
+	if err := utils.CheckEmail(email); err != nil {
+		return FormatError.New(err)
 	}
 
-	hashedPassword, err := checkAndHashPassword(password)
+	hashedPassword, err := utils.CheckAndHashPassword(password)
+	if err != nil {
+		return FormatError.New(err)
+	}
+
+	username, err := generateUsername(email)
 	if err != nil {
 		return err
 	}
 
-	err = database.GetPostgresDB().Create(&models.UserCredential{
-		Email: email,
-		User: models.User{
-			Email: email,
-			Role:  role,
-		},
-		Password: hashedPassword,
-	}).Error
+	err = database.GetPostgresDB().Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(&models.User{Email: email, Username: username, Role: role}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&models.UserCredential{Email: email, Password: hashedPassword}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 
 	var pgerr *pgconn.PgError
 	if err != nil {
@@ -52,37 +60,25 @@ func Register(email, password, role string) error {
 	return nil
 }
 
-var roles = []string{"admin", "mod", "user"}
+func generateUsername(email string) (string, error) {
+	name, domain, found := strings.Cut(email, "@")
+	if !found {
+		return "", FormatError.Newf("invalid email %s", email)
+	}
 
-func checkRole(role string) error {
-	for i := range roles {
-		if role == roles[i] {
-			return nil
+	if !UsernameExists(name) {
+		return name, nil
+	}
+
+	username := name + "." + domain
+	if !UsernameExists(username) {
+		return username, nil
+	}
+
+	for i := 1; ; i++ {
+		username := name + strconv.Itoa(i)
+		if !UsernameExists(username) {
+			return username, nil
 		}
 	}
-	return ValueError.Newf("invalid role %s", role)
-}
-
-func checkEmail(email string) error {
-	if _, err := mail.ParseAddress(email); err != nil {
-		return FormatError.New("invalid email")
-	}
-
-	return nil
-}
-
-func checkAndHashPassword(pwd string) (string, error) {
-	if pwdlen := len(pwd); pwdlen < 6 {
-		return "", FormatError.Newf(
-			"password is required at least 6 characters, but got %d characters", pwdlen)
-	}
-
-	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
-	if err != nil {
-		logger.Event("invalid-password-format").
-			Field("password", pwd).
-			Field("error", err).Debug()
-		return "", EncryptionError.New("password is invalid format")
-	}
-	return string(hashedPwd), nil
 }

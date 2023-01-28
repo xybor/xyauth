@@ -38,7 +38,7 @@ func RevokeHandler(ctx *gin.Context) {
 		if errors.Is(err, service.NotFoundError) {
 			ctx.JSON(http.StatusNotFound, gin.H{"message": "not found the refresh token"})
 		} else {
-			logger.Event("revoke-refresh-token-failed").Field("error", err).Warning()
+			logger.Event("revoke-refresh-token-failed", ctx).Field("error", err).Warning()
 			ctx.JSON(http.StatusInternalServerError, gin.H{"message": "unknown error"})
 		}
 		return

@@ -30,10 +30,13 @@ func VerifyAccessToken(ctx *gin.Context) {
 
 	accessToken := token.AccessToken{}
 	if err := token.Verify(params.AccessToken, &accessToken); err != nil {
-		logger.Event("access-token-invalid").
+		logger.Event("access-token-invalid", ctx).
 			Field("token", params.AccessToken).Field("error", err).Debug()
 		return
 	}
 
+	logger.Event("validated-access-token", ctx).
+		Field("request_id", ctx.MustGet("requestID")).
+		Field("id", accessToken.ID).Info()
 	ctx.Set("accessToken", accessToken)
 }

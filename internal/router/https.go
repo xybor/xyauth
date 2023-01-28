@@ -1,8 +1,6 @@
 package router
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/xybor/xyauth/internal/config"
 	apiv1 "github.com/xybor/xyauth/internal/handlers/api/v1"
@@ -38,20 +36,20 @@ func NewHTTPS() *gin.Engine {
 
 	router.GET(".well-known/openid-configuration", openid.Handler)
 
+	router.GET("", appv1.WelcomeHandler)
+	router.GET("logout", appv1.LogoutHandler)
+
 	router.GET("login", appv1.LoginGETHandler)
 	router.POST("login", appv1.LoginPOSTHandler)
 
 	router.GET("register", appv1.RegisterGETHandler)
 	router.POST("register", appv1.RegisterPOSTHandler)
 
-	router.GET("profile", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "profile.html", nil)
-	})
-
-	router.GET("", appv1.WelcomeHandler)
-	router.GET("logout", appv1.LogoutHandler)
-
 	router.Any("refresh", appv1.RefreshHandler)
+
+	router.GET("profile", appv1.ProfileHandler)
+	router.GET("user/:username", appv1.UserGETHandler)
+	router.POST("user/:username", appv1.UserPOSTHandler)
 
 	apiv1Group := router.Group("api/v1")
 	{

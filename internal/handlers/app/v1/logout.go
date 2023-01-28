@@ -15,7 +15,7 @@ func LogoutHandler(ctx *gin.Context) {
 	defer func() {
 		utils.SetCookie(ctx, "access_token", "", -1)
 		utils.SetCookie(ctx, "refresh_token", "", -1)
-		ctx.Redirect(http.StatusTemporaryRedirect, "")
+		ctx.Redirect(http.StatusTemporaryRedirect, "/")
 	}()
 
 	val, err := ctx.Cookie("refresh_token")
@@ -34,7 +34,7 @@ func LogoutHandler(ctx *gin.Context) {
 
 	if err := service.RevokeRefreshToken(refreshToken); err != nil {
 		if !errors.Is(err, service.NotFoundError) {
-			logger.Event("revoke-refresh-token-failed").Field("error", err).Warning()
+			logger.Event("revoke-refresh-token-failed", ctx).Field("error", err).Warning()
 		}
 		return
 	}

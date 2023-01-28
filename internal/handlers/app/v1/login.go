@@ -20,7 +20,7 @@ type LoginParams struct {
 func LoginGETHandler(ctx *gin.Context) {
 	// Redirect to the main page if the user already authenticated.
 	if utils.IsAuthenticated(ctx) {
-		ctx.Redirect(http.StatusTemporaryRedirect, "")
+		ctx.Redirect(http.StatusTemporaryRedirect, "/")
 	} else {
 		ctx.HTML(http.StatusOK, "login.html", nil)
 	}
@@ -30,7 +30,7 @@ func LoginPOSTHandler(ctx *gin.Context) {
 	params := new(LoginParams)
 	ctx.ShouldBind(params)
 
-	err := service.Authenticate(params.Email, params.Password)
+	id, err := service.Authenticate(params.Email, params.Password)
 	if err != nil {
 		switch {
 		case errors.Is(err, service.NotFoundError):
@@ -38,7 +38,7 @@ func LoginPOSTHandler(ctx *gin.Context) {
 		case errors.Is(err, service.CredentialError):
 			ctx.HTML(http.StatusForbidden, "login.html", gin.H{"message": xyerror.Message(err)})
 		case err != nil:
-			logger.Event("query-user-failed").
+			logger.Event("query-user-failed", ctx).
 				Field("email", params.Email).Field("error", err).Warning()
 			ctx.HTML(http.StatusInternalServerError, "error.html", gin.H{
 				"message": "500 Internal Server Error - " + err.Error(),
@@ -47,7 +47,7 @@ func LoginPOSTHandler(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := service.CreateAccessToken(params.Email)
+	accessToken, err := service.CreateAccessToken(id)
 	if err != nil {
 		ctx.HTML(http.StatusInternalServerError, "error.html", gin.H{
 			"message": "500 Internal Server Error - " + err.Error(),
@@ -55,7 +55,7 @@ func LoginPOSTHandler(ctx *gin.Context) {
 		return
 	}
 
-	refreshToken, err := service.CreateRefreshToken(params.Email)
+	refreshToken, err := service.CreateRefreshToken(id)
 	if err != nil {
 		ctx.HTML(http.StatusInternalServerError, "error.html", gin.H{
 			"message": "500 Internal Server Error - " + err.Error(),
@@ -68,7 +68,7 @@ func LoginPOSTHandler(ctx *gin.Context) {
 
 	uri, ok := ctx.GetQuery("redirect_uri")
 	if !ok {
-		uri = ""
+		uri = "/"
 	}
 	ctx.Redirect(http.StatusMovedPermanently, uri)
 }

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"net/mail"
 	"reflect"
 	"unicode"
 
@@ -8,7 +9,9 @@ import (
 	"github.com/xybor-x/xyerror"
 	"github.com/xybor-x/xypriv"
 	"github.com/xybor/xyauth/internal/logger"
+	"github.com/xybor/xyauth/internal/models"
 	"github.com/xybor/xyauth/internal/token"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Check returns a privilege Checker. If the access token is available, the
@@ -16,7 +19,7 @@ import (
 // check with the nil subject.
 func Check(ctx *gin.Context) *xypriv.Checker {
 	if accessToken, ok := GetAccessToken(ctx); ok {
-		return xypriv.Check(accessToken.User).Delegate(accessToken)
+		return xypriv.Check(accessToken.GetUser()).Delegate(accessToken)
 	}
 	return xypriv.Check(nil)
 }
@@ -28,7 +31,7 @@ func GetAccessToken(ctx *gin.Context) (token.AccessToken, bool) {
 		if accessToken, ok := val.(token.AccessToken); ok {
 			return accessToken, true
 		}
-		logger.Event("invalid-access-token").Field("token", val).Warning()
+		logger.Event("invalid-access-token", ctx).Field("token", val).Warning()
 	}
 	return token.AccessToken{}, false
 }
@@ -76,4 +79,36 @@ func GetSnakeCase(a any) (string, error) {
 	}
 
 	return string(result), nil
+}
+
+func CheckRole(role string) error {
+	for i := range models.Roles {
+		if role == models.Roles[i] {
+			return nil
+		}
+	}
+	return xyerror.ValueError.Newf("invalid role %s", role)
+}
+
+func CheckEmail(email string) error {
+	if _, err := mail.ParseAddress(email); err != nil {
+		return xyerror.ValueError.New("invalid email")
+	}
+	return nil
+}
+
+func CheckAndHashPassword(pwd string) (string, error) {
+	if pwdlen := len(pwd); pwdlen < 6 {
+		return "", xyerror.ValueError.Newf(
+			"password is required at least 6 characters, but got %d characters", pwdlen)
+	}
+
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	if err != nil {
+		logger.Event("invalid-password-format").
+			Field("password", pwd).
+			Field("error", err).Debug()
+		return "", xyerror.ValueError.New("password is invalid format")
+	}
+	return string(hashedPwd), nil
 }

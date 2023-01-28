@@ -20,7 +20,7 @@ func WelcomeHandler(ctx *gin.Context) {
 
 	name := "Stranger"
 	if accessToken, ok := utils.GetAccessToken(ctx); ok {
-		name = strings.Split(accessToken.User.Email, "@")[0]
+		name = strings.Split(accessToken.GetUser().Email, "@")[0]
 	}
 	ctx.HTML(http.StatusOK, "welcome.html", gin.H{"name": name})
 }
