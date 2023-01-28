@@ -70,7 +70,10 @@ func InheritRefreshToken(request token.RefreshToken) (string, error) {
 			{Key: "id", Value: request.ID},
 			{Key: "counter", Value: info.Counter}, // Avoid race condition
 		},
-		bson.D{{Key: "$inc", Value: bson.D{{Key: "counter", Value: 1}}}},
+		bson.D{
+			{Key: "$inc", Value: bson.D{{Key: "counter", Value: 1}}},
+			{Key: "$set", Value: bson.D{{Key: "expiration", Value: time.Now().Add(token.RefreshTokenExpiration)}}},
+		},
 	)
 
 	if err != nil {
