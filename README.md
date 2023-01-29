@@ -2,7 +2,14 @@
 
 Xyauth is an authentication provider which is compatible with oauth2 and openid.
 
-The website is hosted at [xybor space](https://xybor.space).
+_The project supports both cloud (AWS) and on-prem deployment._
+
+<div align="center">
+  <img src="./assets/aws.drawio.svg" />
+</div>
+<div align="center">
+  <i>The website has been hosting on AWS and can be accessed at <a href="https://xybor.space"> xybor.space <a/> </i>
+</div>
 
 # Features
 
@@ -33,7 +40,7 @@ The website is hosted at [xybor space](https://xybor.space).
 - Only moderator creates moderator account.
 - Member can visit other user profiles with limited privileges.
 - Admin can see all user information.
-- etc. 
+- etc.
 
 # Techniques
 
