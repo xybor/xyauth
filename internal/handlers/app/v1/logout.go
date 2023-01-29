@@ -15,7 +15,7 @@ func LogoutHandler(ctx *gin.Context) {
 	defer func() {
 		utils.SetCookie(ctx, "access_token", "", -1)
 		utils.SetCookie(ctx, "refresh_token", "", -1)
-		ctx.Redirect(http.StatusTemporaryRedirect, "/")
+		ctx.Redirect(http.StatusSeeOther, "/")
 	}()
 
 	val, err := ctx.Cookie("refresh_token")
