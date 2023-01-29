@@ -3,11 +3,11 @@ package token
 import (
 	"crypto/rsa"
 	"errors"
-	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/xybor-x/xycond"
+	"github.com/xybor/xyauth/internal/certificate"
 	"github.com/xybor/xyauth/internal/config"
 	"github.com/xybor/xyauth/internal/logger"
 )
@@ -33,11 +33,17 @@ func init() {
 	// merged.
 	var err error
 	key := config.MustGet("OAUTH_PRIVATE_KEY").MustString()
-	privateKey, err = jwt.ParseRSAPrivateKeyFromPEM([]byte(strings.ReplaceAll(key, `\n`, "\n")))
+	content, err := certificate.GetCertificateContent(key)
+	xycond.AssertNil(err)
+
+	privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(content)
 	xycond.AssertNil(err)
 
 	key = config.MustGet("OAUTH_PUBLIC_KEY").MustString()
-	publicKey, err = jwt.ParseRSAPublicKeyFromPEM([]byte(strings.ReplaceAll(key, `\n`, "\n")))
+	content, err = certificate.GetCertificateContent(key)
+	xycond.AssertNil(err)
+
+	publicKey, err = jwt.ParseRSAPublicKeyFromPEM(content)
 	xycond.AssertNil(err)
 }
 
