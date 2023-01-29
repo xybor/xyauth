@@ -4,9 +4,9 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/xybor-x/xycond"
+	"github.com/xybor/xyauth/internal/certificate"
 	"github.com/xybor/xyauth/internal/config"
 	"github.com/xybor/xyauth/internal/router"
 )
@@ -23,10 +23,12 @@ func NewHTTPS() func() error {
 	// TODO: ReplaceAll commands will be removed if the PR 156 of godotenv is
 	// merged.
 	key := config.MustGet("SERVER_PUBLIC_KEY").MustString()
-	publicKey := []byte(strings.ReplaceAll(key, `\n`, "\n"))
+	publicKey, err := certificate.GetCertificateContent(key)
+	xycond.AssertNil(err)
 
 	key = config.MustGet("SERVER_PRIVATE_KEY").MustString()
-	privateKey := []byte(strings.ReplaceAll(key, `\n`, "\n"))
+	privateKey, err := certificate.GetCertificateContent(key)
+	xycond.AssertNil(err)
 
 	cert, err := tls.X509KeyPair(publicKey, privateKey)
 	xycond.AssertNil(err)

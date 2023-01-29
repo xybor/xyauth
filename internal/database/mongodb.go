@@ -5,10 +5,10 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"strings"
 
 	"github.com/xybor-x/xyerror"
+	"github.com/xybor/xyauth/internal/certificate"
 	"github.com/xybor/xyauth/internal/config"
 	"github.com/xybor/xyauth/internal/logger"
 	"github.com/xybor/xyauth/internal/models"
@@ -48,7 +48,7 @@ func InitMongoDB() error {
 
 	opts := options.Client().ApplyURI(dsn)
 
-	if val, ok := config.Get("mongodb.ssl_ca_certs"); ok {
+	if val, ok := config.Get("MONGO_SSL_CA_CERTS"); ok {
 		tlsConfig, err := getCustomTLSConfig(val.MustString())
 		if err != nil {
 			return err
@@ -100,20 +100,12 @@ func DropAllNoSQL() error {
 }
 
 func getCustomTLSConfig(caFile string) (*tls.Config, error) {
-	tlsConfig := new(tls.Config)
-
-	var certs []byte
-	var err error
-	if strings.HasPrefix(caFile, "s3://") {
-		certs, err = utils.ReadS3(caFile)
-	} else {
-		certs, err = ioutil.ReadFile(caFile)
-	}
-
+	certs, err := certificate.GetCertificateContent(caFile)
 	if err != nil {
 		return nil, err
 	}
 
+	tlsConfig := new(tls.Config)
 	tlsConfig.RootCAs = x509.NewCertPool()
 	if ok := tlsConfig.RootCAs.AppendCertsFromPEM(certs); !ok {
 		return tlsConfig, xyerror.ValueError.New("Failed parsing pem file")
