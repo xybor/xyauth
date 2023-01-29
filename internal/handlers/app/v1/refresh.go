@@ -14,7 +14,7 @@ import (
 )
 
 func redirectToLogin(ctx *gin.Context) {
-	ctx.Redirect(http.StatusMovedPermanently, "/login?redirect_uri="+ctx.Query("redirect_uri"))
+	ctx.Redirect(http.StatusSeeOther, "/login?redirect_uri="+ctx.Query("redirect_uri"))
 }
 
 func RefreshHandler(ctx *gin.Context) {

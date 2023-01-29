@@ -15,7 +15,7 @@ import (
 
 func ProfileHandler(ctx *gin.Context) {
 	if accessToken, ok := utils.GetAccessToken(ctx); ok {
-		ctx.Redirect(http.StatusMovedPermanently, fmt.Sprintf("/user/%s", accessToken.Username))
+		ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/user/%s", accessToken.Username))
 		return
 	}
 	utils.RedirectToRefresh(ctx)
@@ -133,5 +133,5 @@ func UserPOSTHandler(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Redirect(http.StatusMovedPermanently, fmt.Sprintf("/user/%s", username))
+	ctx.Redirect(http.StatusSeeOther, fmt.Sprintf("/user/%s", username))
 }

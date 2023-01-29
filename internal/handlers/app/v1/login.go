@@ -20,7 +20,7 @@ type LoginParams struct {
 func LoginGETHandler(ctx *gin.Context) {
 	// Redirect to the main page if the user already authenticated.
 	if utils.IsAuthenticated(ctx) {
-		ctx.Redirect(http.StatusTemporaryRedirect, "/")
+		ctx.Redirect(http.StatusSeeOther, "/")
 	} else {
 		ctx.HTML(http.StatusOK, "login.html", nil)
 	}
@@ -70,5 +70,5 @@ func LoginPOSTHandler(ctx *gin.Context) {
 	if !ok {
 		uri = "/"
 	}
-	ctx.Redirect(http.StatusMovedPermanently, uri)
+	ctx.Redirect(http.StatusSeeOther, uri)
 }
